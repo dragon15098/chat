@@ -1,0 +1,45 @@
+CREATE TABLE app_user (
+  id INT(6) AUTO_INCREMENT PRIMARY KEY, 
+  user_name VARCHAR(30) NOT NULL, 
+  pass_word VARCHAR(30) NOT NULL,
+  frist_name VARCHAR(200),
+  last_name VARCHAR(200)
+);
+INSERT INTO `db_chat`.`app_user` (`id`, `user_name`, `pass_word`, `frist_name`, `last_name`) 
+VALUES 
+  ('1', 'admin1', 'admin1', 'admin1', 'admin1'), 
+  ('2', 'admin2', 'admin2', 'admin2', 'admin2'), 
+  ('3', 'admin3', 'admin3', 'admin3', 'admin3'), 
+  ('4', 'admin4', 'admin4', 'admin4', 'admin4');
+CREATE TABLE message (
+  id INT(6) AUTO_INCREMENT PRIMARY KEY, 
+  from_user_id INT(6) NOT NULL, 
+  to_user_id INT(6) NOT NULL, 
+  content VARCHAR(2000) NOT NULL, 
+  send_time DATETIME DEFAULT CURRENT_TIMESTAMP, 
+  read_time DATETIME, 
+  CONSTRAINT fk_from_user_id FOREIGN KEY (from_user_id) REFERENCES app_user (id), 
+  CONSTRAINT fk_to_user_id FOREIGN KEY (to_user_id) REFERENCES app_user (id)
+);
+
+
+CREATE TABLE relationship (
+id INT(6) AUTO_INCREMENT PRIMARY KEY,
+frist_user_id INT(6) NOT NULL,
+second_user_id INT(6) NOT NULL,
+status int(1) NOT NULL DEFAULT 0, 
+CONSTRAINT fk_frist_user_id FOREIGN KEY (frist_user_id) REFERENCES app_user (id),
+CONSTRAINT fk_second_user_id FOREIGN KEY (second_user_id) REFERENCES app_user (id)
+);
+CREATE TABLE group_chat (
+  id INT(6) AUTO_INCREMENT PRIMARY KEY, 
+  content VARCHAR(20)
+);
+CREATE TABLE group_chat_detail (
+  id INT(6) AUTO_INCREMENT PRIMARY KEY, 
+  group_id INT(6) NOT NULL,
+user_id INT(6) NOT NULL,
+CONSTRAINT fk_group_id FOREIGN KEY (group_id) REFERENCES group_chat (id),
+CONSTRAINT fk_group_user_id FOREIGN KEY (user_id) REFERENCES app_user (id)
+ );
+
