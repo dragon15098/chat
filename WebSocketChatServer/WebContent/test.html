@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+table {
+  border: 1px solid black;
+}
+</style>
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<title>Demo websocket</title>
+</head>
+<body>
+	<p>Click the button to add a new row at the first position of the table and then add cells and content.</p>
+	<button type="button" onclick="myFunction()">Try it</button>
+	
+	<table id="myTable">
+	 
+	</table>
+	<br>
+
+	<h2>Demo WebSocket Chat Room</h2>
+	<input id="textMessage" type="text" />
+	<input onclick="sendMessage()" value="Send Message" type="button" />
+	<br />
+	<br />
+
+	<textarea id="textAreaMessage" rows="10" cols="50"></textarea>
+
+	<script type="text/javascript">
+		function loadMessage(toUserId){
+			if (typeof websocket != 'undefined'
+				&& websocket.readyState == WebSocket.OPEN) {
+			var message = $('#textMessage').val();
+			var content = $('#textMessage').val();
+			var message = {
+				'toUser' : toUserId,
+				'token' : cookie,
+				'function' : 'GET_MESSAGE'
+			}
+			console.log(message);
+			websocket.send(JSON.stringify(message));
+			textMessage.value = "";
+
+			}
+		}
+		function myFunction(friend) {
+		  var table = document.getElementById("myTable");
+		  var row = table.insertRow(0);
+		   var currentRow = table.rows[0];
+		   currentRow.id = friend.id;
+		    var createClickHandler = function(row) {
+		      return function() {
+		        var toUserId = row.id;
+		        alert("id:" + toUserId);
+		        loadMessage(toUserId);
+		      };
+		    };
+		    currentRow.onclick = createClickHandler(currentRow);
+		  var cell1 = row.insertCell(0);
+		  var cell2 = row.insertCell(1);
+		  cell1.innerHTML = friend.firstName;
+		  cell2.innerHTML = friend.lastName;
+		}
+		
+		var cookie = window.location.hash.substring(1);
+		
+		var websocket = new WebSocket(
+				"ws://localhost:8080/WebSocketChatServer/chatRoomServer");
+		websocket.onopen = function(message) {
+			processOpen(message);
+		};
+		websocket.onmessage = function(message) {
+			processMessage(message);
+		};
+		websocket.onclose = function(message) {
+			processClose(message);
+		};
+		websocket.onerror = function(message) {
+			processError(message);
+		};
+
+		function processOpen(message) {
+			textAreaMessage.value += "Server connect... \n";
+		}
+		function processMessage(message) {
+			console.log(message);
+			var respone = JSON.parse(message.data);
+			//textAreaMessage.value += message.data + " \n";
+			console.log(respone);
+			if(respone.code == 200){
+				if(respone.typeRequest == "getRelationship"){
+					console.log("passType: " + respone.content);
+					var content = respone.content;
+					for (x of content) {
+						myFunction(x);
+					}
+				}
+				if(respone.typeRequest == "getMessage"){
+					console.log("passType: " + respone.content);
+					var content = respone.content;
+					console.log(content);
+				}
+			}
+		}
+		function processClose(message) {
+			textAreaMessage.value += "Server Disconnect... \n";
+		}
+		function processError(message) {
+			textAreaMessage.value += "Error... " + message + " \n";
+		}
+
+		function sendMessage() {
+			if (typeof websocket != 'undefined'
+					&& websocket.readyState == WebSocket.OPEN) {
+				var message = $('#textMessage').val();
+				var content = $('#textMessage').val();
+				var message = {
+					'toUser' : '2',
+					'token' : cookie,
+					'content' : content,
+					'function' : 'START_CONNECTION'
+				}
+				console.log(message);
+				websocket.send(JSON.stringify(message));
+				textMessage.value = "";
+			}
+		}
+	</script>
+</body>
+</html>
