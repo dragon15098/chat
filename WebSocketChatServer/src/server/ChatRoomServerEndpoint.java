@@ -13,10 +13,11 @@ import javax.websocket.server.ServerEndpoint;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import models.Request;
+
 import models.dto.MessageDTO;
 import models.dto.MessageRespone;
 import models.dto.UserDTO;
+import request.Request;
 import service.impl.MessageDAOImpl;
 import service.impl.RelationshipDAOImpl;
 
@@ -37,39 +38,24 @@ public class ChatRoomServerEndpoint {
 	public void handleMessage(String message, Session userSession) throws IOException {
 		ObjectMapper mapper = new ObjectMapper();
 		Request messageFromUser = mapper.readValue(message, Request.class);
+		// chua co connect trong map
 		if (userMapping.get(messageFromUser.token) == null) {
 			userMapping.put(messageFromUser.token, userSession);
 			if (relationshipDAOImpl == null) {
 				relationshipDAOImpl = new RelationshipDAOImpl();
 			}
-			if (messageFromUser.function.equals("START_CONNECTION")) {
+			// tao connection 
+			if ("START_CONNECTION".equals(messageFromUser.function)) {
 				UserDTO dto = new UserDTO();
-				dto.id = 1;
-				List<UserDTO> dtos = relationshipDAOImpl.findRelationshipByUserId(dto);
-				MessageRespone<List<UserDTO>> respone = new MessageRespone<>();
-				respone.code = 200;
-				respone.content = dtos;
-				respone.typeRequest = "getRelationship";
-				userSession.getBasicRemote().sendText(mapper.writeValueAsString(respone));
-
-				// send back message
-				List<MessageDTO> messages = getMessageFromDB(dto.id, null);
-				MessageRespone<List<MessageDTO>> responeMessage = new MessageRespone<>();
-				responeMessage.code = 200;
-				responeMessage.content = messages;
-				responeMessage.typeRequest = "getMessage";
-				userSession.getBasicRemote().sendText(mapper.writeValueAsString(responeMessage));
+				dto.id = Integer.parseInt(messageFromUser.token);
+				
+				getFriendList(userSession, dto);
+				loadMessage(userSession, Integer.parseInt(messageFromUser.token));
 			}
 
 		} else {
-			if (messageFromUser.function.endsWith("GET_MESSAGE")) {
-				// send back message
-				List<MessageDTO> messages = getMessageFromDB(Integer.parseInt(messageFromUser.toUser), null);
-				MessageRespone<List<MessageDTO>> responeMessage = new MessageRespone<>();
-				responeMessage.code = 200;
-				responeMessage.content = messages;
-				responeMessage.typeRequest = "getMessage";
-				userSession.getBasicRemote().sendText(mapper.writeValueAsString(responeMessage));
+			if ("GET_MESSAGE".equals(messageFromUser.function)) {
+				loadMessage(userSession, Integer.parseInt(messageFromUser.token));
 			} else {
 				Integer toUserId = Integer.parseInt(messageFromUser.toUser);
 				Integer fromUserId = Integer.parseInt(messageFromUser.token);
@@ -89,6 +75,26 @@ public class ChatRoomServerEndpoint {
 		}
 	}
 
+	private void getFriendList(Session userSession, UserDTO dto) {
+		List<UserDTO> dtos = relationshipDAOImpl.findRelationshipByUserId(dto);
+		MessageRespone<List<UserDTO>> respone = new MessageRespone<>();
+		respone.code = 200;
+		respone.content = dtos;
+		respone.typeRequest = "getRelationship";
+		new ResponeSender().sentRespone(userSession, respone);
+	}
+	
+	
+	private void loadMessage(Session userSession, Integer userId) {
+		// send back message
+		List<MessageDTO> messages = getMessageFromDB(userId, null);
+		MessageRespone<List<MessageDTO>> responeMessage = new MessageRespone<>();
+		responeMessage.code = 200;
+		responeMessage.content = messages;
+		responeMessage.typeRequest = "getMessage";
+		new ResponeSender().sentRespone(userSession, responeMessage);
+	}
+	
 	private List<MessageDTO> getMessageFromDB(Integer userId, Integer groupId) {
 		if (messageDAOImpl == null) {
 			messageDAOImpl = new MessageDAOImpl();
