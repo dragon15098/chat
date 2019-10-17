@@ -1,11 +1,11 @@
-package service.impl;
+package repository.impl;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import models.dto.UserDTO;
-import service.UserDAO;
+import repository.UserDAO;
 
 public class UserDAOImpl extends DAO implements UserDAO {
 

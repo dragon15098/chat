@@ -1,4 +1,4 @@
-package service.impl;
+package repository.impl;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import models.dto.MessageDTO;
-import service.MessageDAO;
+import repository.MessageDAO;
 
 public class MessageDAOImpl extends DAO implements MessageDAO{
 
@@ -21,6 +21,11 @@ public class MessageDAOImpl extends DAO implements MessageDAO{
 			preparedStatement.setInt(1, message.fromUserId);
 			preparedStatement.setInt(2, message.toUserId);
 			preparedStatement.setString(3, message.content);
+		   int affectedRows = preparedStatement.executeUpdate();
+
+	        if (affectedRows == 0) {
+	            throw new SQLException("Creating user failed, no rows affected.");
+	        }
 			 try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
 		            if (generatedKeys.next()) {
 		                message.id = (generatedKeys.getLong(1));
@@ -36,13 +41,15 @@ public class MessageDAOImpl extends DAO implements MessageDAO{
 	}
 
 	@Override
-	public List<MessageDTO> getMessageFromDB(Integer userId, Integer groupId) {
+	public List<MessageDTO> getMessageFromDB(Integer fromUserId, Integer toUserId, Integer groupId) {
 		if(groupId== null) {
-			String selectSql = "SELECT * FROM message WHERE from_user_id = ? OR to_user_id = ?";
+			String selectSql = "SELECT * FROM message WHERE (from_user_id = ? AND to_user_id = ?) OR (from_user_id = ? AND to_user_id = ?)";
 			try {
 				PreparedStatement preparedStatement = getConnection().prepareStatement(selectSql);
-				preparedStatement.setInt(1, userId);
-				preparedStatement.setInt(2, userId);
+				preparedStatement.setInt(1, fromUserId);
+				preparedStatement.setInt(2, toUserId);
+				preparedStatement.setInt(3, toUserId);
+				preparedStatement.setInt(4, fromUserId);
 				ResultSet resultSet = preparedStatement.executeQuery();
 				List<MessageDTO> messages = new ArrayList<>();
 				while(resultSet.next()) {
@@ -52,8 +59,9 @@ public class MessageDAOImpl extends DAO implements MessageDAO{
 					messageDTO.toUserId = resultSet.getInt(3);
 					messageDTO.content = resultSet.getString(4);
 					messages.add(messageDTO);
-					return messages;
+					
 				}
+				return messages;
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

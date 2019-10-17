@@ -311,54 +311,11 @@ img{ max-width:100%;}
                 </div>
                 <div class="mesgs">
                     <div id="msg_history" class="msg_history">
-                        <div class="incoming_msg">
-                            <div class="incoming_msg_img"> 
-                            <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
-                            <div class="received_msg">
-                                <div class="received_withd_msg">
-                                    <p>Test which is a new approach to have all
-                                        solutions</p>
-                                    <span class="time_date"> 11:01 AM | June 9</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="outgoing_msg">
-                            <div class="sent_msg">
-                                <p>Test which is a new approach to have all
-                                    solutions</p>
-                                <span class="time_date"> 11:01 AM | June 9</span>
-                            </div>
-                        </div>
-                        <div class="incoming_msg">
-                            <div class="incoming_msg_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
-                            <div class="received_msg">
-                                <div class="received_withd_msg">
-                                    <p>Test, which is a new approach to have</p>
-                                    <span class="time_date"> 11:01 AM | Yesterday</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="outgoing_msg">
-                            <div class="sent_msg">
-                                <p>Apollo University, Delhi, India Test</p>
-                                <span class="time_date"> 11:01 AM | Today</span>
-                            </div>
-                        </div>
-                        <div class="incoming_msg">
-                            <div class="incoming_msg_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
-                            <div class="received_msg">
-                                <div class="received_withd_msg">
-                                    <p>We work directly with our designers and suppliers,
-                                        and sell direct to you, which means quality, exclusive
-                                        products, at a price anyone can afford.</p>
-                                    <span class="time_date"> 11:01 AM | Today</span>
-                                </div>
-                            </div>
-                        </div>
+                        
                     </div>
                     <div class="type_msg">
                         <div class="input_msg_write">
-                            <input type="text" class="write_msg" placeholder="Type a message" id="textAreaMessage"/>
+                            <input type="text" class="write_msg" placeholder="Type a message" id="textMessage"/>
                             <button class="msg_send_btn" type="button" onclick="sendMessage()" value="Send Message">
                             <i class="fas fa-paper-plane"></i>
                             </button>
@@ -370,6 +327,8 @@ img{ max-width:100%;}
     </div>
     <script type="text/javascript">
     var cookie = window.location.hash.substring(1);
+    var currentUser;
+    var friendList;
     var websocket = new WebSocket(
         "ws://localhost:8080/WebSocketChatServer/chatRoomServer");
     websocket.onopen = function(message) {
@@ -385,34 +344,90 @@ img{ max-width:100%;}
         processError(message);
     };
     function processOpen(message) {
-        textAreaMessage.value += "Server connect... \n";
+        //textAreaMessage.value += "Server connect... \n";
     }
     function processMessage(message) {
-        console.log(message);
         var respone = JSON.parse(message.data);
         console.log(respone);
         if(respone.code ==200){
         	if(respone.typeRequest == 'getMessage'){
         		for (i in respone.content) {
-        			showMessage(respone.content[i]);
-       			}
+        			if(respone.content[i].fromUserId == cookie){
+        				showMyMessage(respone.content[i].content);
+        			}
+        			else{
+        				showFriendMessage(respone.content[i].content);
+        			}
+        		}
         		
         	}
 			if(respone.typeRequest == 'getRelationship'){
-        		
+        		showFriendList(respone.content);
+        		getMessage();
+        	}
+			if(respone.typeRequest == 'getMessageFromUser'){
+        		showMessageRealTime(respone.content);
         	}
         }
     }
     function processClose(message) {
-        textAreaMessage.value += "Server Disconnect... \n";
+        //textAreaMessage.value += "Server Disconnect... \n";
     }
     function processError(message) {
-        textAreaMessage.value += "Error... " + message + " \n";
+        //textAreaMessage.value += "Error... " + message + " \n";
     }
     
+    function showFriendList(list){
+    	friendList = list;
+    	currentUser = list[0].id;
+    }
     
-    function showMessage(x){
-    	console.log(x);
+    function showMessageRealTime(message){
+    	showFriendMessage(message);
+    }
+    
+    function showFriendMessage(message){
+    	console.log(message);
+    	var element = document.getElementById("msg_history");
+    	
+    	var fristDiv = document.createElement("div");
+    	fristDiv.classList.add('incoming_msg');
+    	
+    	var secondDiv = document.createElement("div");
+    	secondDiv.classList.add('incoming_msg_img');
+    	
+    	var image = document.createElement("img");
+    	image.src = "https://ptetutorials.com/images/user-profile.png";
+   		image.alt = "sunil";
+   		secondDiv.appendChild(image);
+    	fristDiv.appendChild(secondDiv);
+
+    	
+    	var thirdDiv = document.createElement("div");
+    	thirdDiv.classList.add('received_msg');
+    	fristDiv.appendChild(thirdDiv);
+    	
+    	var fourdDiv = document.createElement("div");
+    	fourdDiv.classList.add('received_withd_msg');
+    	thirdDiv.appendChild(fourdDiv);
+    	
+    	
+    	var para = document.createElement("p");
+    	fourdDiv.appendChild(para);
+    	var node = document.createTextNode(message);
+    	para.appendChild(node);
+
+    	var s = document.createElement("span");
+    	s.classList.add('time_date');
+    	
+    	var node2 = document.createTextNode("11:01 AM | June 9");
+    	s.appendChild(node2);
+    	fourdDiv.appendChild(s);
+    	
+    	element.appendChild(fristDiv);
+    }
+    
+    function showMyMessage(message){
     	var element = document.getElementById("msg_history");
     	var fristDiv = document.createElement("div");
     	fristDiv.classList.add('outgoing_msg');
@@ -422,7 +437,7 @@ img{ max-width:100%;}
 
     	var para = document.createElement("p");
     	secondDiv.appendChild(para);
-    	var node = document.createTextNode(x.content);
+    	var node = document.createTextNode(message);
     	para.appendChild(node);
 
     	var s = document.createElement("span");
@@ -431,17 +446,33 @@ img{ max-width:100%;}
     	var node2 = document.createTextNode("11:01 AM | June 9");
     	s.appendChild(node2);
     	element.appendChild(fristDiv);
-
     }
+    
+    
+    function getMessage(){
+    	 if (typeof websocket != 'undefined' &&
+    	            websocket.readyState == WebSocket.OPEN) {
+    	            var message = {
+    	                'toUser': currentUser,
+    	                'token': cookie,
+    	                'function': 'GET_MESSAGE'
+    	            }
+    	            console.log(message);
+    	            websocket.send(JSON.stringify(message));
+    	           
+    	        }
+    }
+    
     function sendMessage() {
         if (typeof websocket != 'undefined' &&
             websocket.readyState == WebSocket.OPEN) {
-            var message = $('#textMessage').val();
-            var context = $('#textMessage').val();
+            var content = $('#textMessage').val();
+            $('#textMessage').val("");
             var message = {
-                'toUser': '2',
+                'toUser': currentUser,
                 'token': cookie,
-                'context': context
+                'content': content,
+                'function': 'SEND_MESSAGE'
             }
             console.log(message);
             websocket.send(JSON.stringify(message));
@@ -455,7 +486,6 @@ img{ max-width:100%;}
                 var message = $('#textMessage').val();
                 var context = $('#textMessage').val();
                 var message = {
-                		'toUser': '2',
                     'token': cookie,
                     'function': 'START_CONNECTION'
                 }

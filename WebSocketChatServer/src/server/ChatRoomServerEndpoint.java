@@ -13,13 +13,12 @@ import javax.websocket.server.ServerEndpoint;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-
 import models.dto.MessageDTO;
 import models.dto.MessageRespone;
 import models.dto.UserDTO;
+import repository.impl.MessageDAOImpl;
+import repository.impl.RelationshipDAOImpl;
 import request.Request;
-import service.impl.MessageDAOImpl;
-import service.impl.RelationshipDAOImpl;
 
 @ServerEndpoint(value = "/chatRoomServer")
 public class ChatRoomServerEndpoint {
@@ -44,62 +43,70 @@ public class ChatRoomServerEndpoint {
 			if (relationshipDAOImpl == null) {
 				relationshipDAOImpl = new RelationshipDAOImpl();
 			}
-			// tao connection 
+			// tao connection
 			if ("START_CONNECTION".equals(messageFromUser.function)) {
 				UserDTO dto = new UserDTO();
 				dto.id = Integer.parseInt(messageFromUser.token);
-				
+
 				getFriendList(userSession, dto);
-				loadMessage(userSession, Integer.parseInt(messageFromUser.token));
+				//loadMessage(userSession, Integer.parseInt(messageFromUser.token),messageFromUser.toUser);
 			}
 
 		} else {
 			if ("GET_MESSAGE".equals(messageFromUser.function)) {
-				loadMessage(userSession, Integer.parseInt(messageFromUser.token));
-			} else {
-				Integer toUserId = Integer.parseInt(messageFromUser.toUser);
+				loadMessage(userSession, Integer.parseInt(messageFromUser.token),  messageFromUser.toUser);
+			} 
+			if( "SEND_MESSAGE".equals(messageFromUser.function)) {		
+				Integer toUserId = messageFromUser.toUser;
 				Integer fromUserId = Integer.parseInt(messageFromUser.token);
 				MessageDTO messageDTO = new MessageDTO();
 				messageDTO.toUserId = toUserId;
 				messageDTO.fromUserId = fromUserId;
 				messageDTO.content = messageFromUser.content;
 				saveMessageToDB(messageDTO);
-				Session sessionUserReceipt = userMapping.get("2");
-				if (sessionUserReceipt != null) {
-					if (sessionUserReceipt.isOpen()) {
-						sessionUserReceipt.getBasicRemote().sendText(messageFromUser.content);
+				Session sessionUserReceiver = userMapping.get("2");
+				if (sessionUserReceiver != null) {
+					if (sessionUserReceiver.isOpen()) {
+						sendMessageToOnlineUser(sessionUserReceiver, messageFromUser.content);
 					}
 				}
-
 			}
 		}
 	}
 
+	private void sendMessageToOnlineUser(Session receiverSession, String message) {
+		MessageRespone<String> messageRespone = new MessageRespone<>();
+		messageRespone.code = 200;
+		messageRespone.content = message;
+		messageRespone.typeRequest = "getMessageFromUser";
+		ResponeSender.sentRespone(receiverSession, messageRespone);
+	}
+	
+	
 	private void getFriendList(Session userSession, UserDTO dto) {
 		List<UserDTO> dtos = relationshipDAOImpl.findRelationshipByUserId(dto);
 		MessageRespone<List<UserDTO>> respone = new MessageRespone<>();
 		respone.code = 200;
 		respone.content = dtos;
 		respone.typeRequest = "getRelationship";
-		new ResponeSender().sentRespone(userSession, respone);
+		ResponeSender.sentRespone(userSession, respone);
 	}
-	
-	
-	private void loadMessage(Session userSession, Integer userId) {
+
+	private void loadMessage(Session userSession, Integer fromUserId, Integer toUserId) {
 		// send back message
-		List<MessageDTO> messages = getMessageFromDB(userId, null);
+		List<MessageDTO> messages = getMessageFromDB(fromUserId, toUserId, null);
 		MessageRespone<List<MessageDTO>> responeMessage = new MessageRespone<>();
 		responeMessage.code = 200;
 		responeMessage.content = messages;
 		responeMessage.typeRequest = "getMessage";
-		new ResponeSender().sentRespone(userSession, responeMessage);
+		ResponeSender.sentRespone(userSession, responeMessage);
 	}
-	
-	private List<MessageDTO> getMessageFromDB(Integer userId, Integer groupId) {
+
+	private List<MessageDTO> getMessageFromDB(Integer fromUserId, Integer toUderId, Integer groupId) {
 		if (messageDAOImpl == null) {
 			messageDAOImpl = new MessageDAOImpl();
 		}
-		return messageDAOImpl.getMessageFromDB(userId, groupId);
+		return messageDAOImpl.getMessageFromDB(fromUserId, toUderId, groupId);
 
 	}
 
@@ -107,7 +114,7 @@ public class ChatRoomServerEndpoint {
 		if (messageDAOImpl == null) {
 			messageDAOImpl = new MessageDAOImpl();
 		}
-		// messageDAOImpl.insertMessage(message);
+		messageDAOImpl.insertMessage(message);
 	}
 
 	@OnClose

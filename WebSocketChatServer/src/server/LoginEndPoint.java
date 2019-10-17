@@ -13,7 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import models.dto.LoginRespone;
 import models.dto.UserDTO;
-import service.impl.UserDAOImpl;
+import repository.impl.UserDAOImpl;
 
 @ServerEndpoint(value = "/login")
 public class LoginEndPoint {

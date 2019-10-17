@@ -1,4 +1,4 @@
-package service.impl;
+package repository.impl;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import models.dto.UserDTO;
-import service.RelationshipDAO;
+import repository.RelationshipDAO;
 
 public class RelationshipDAOImpl extends DAO implements RelationshipDAO {
 

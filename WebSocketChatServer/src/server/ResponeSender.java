@@ -10,7 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import models.dto.MessageRespone;
 
 public class ResponeSender {
-	public void sentRespone(Session session, MessageRespone messageRespone) {
+	public static void sentRespone(Session session, MessageRespone messageRespone) {
 		ObjectMapper mapper = new ObjectMapper();
 		try {
 			session.getBasicRemote().sendText(mapper.writeValueAsString(messageRespone));

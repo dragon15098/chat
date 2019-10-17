@@ -1,7 +1,7 @@
 package request;
 
 public class Request {
-	public String toUser;
+	public Integer toUser;
 	public String toGroupUser;
 	public String content;
 	public String token;
