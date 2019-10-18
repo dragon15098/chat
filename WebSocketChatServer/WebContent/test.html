@@ -286,27 +286,7 @@ img{ max-width:100%;}
                                 </span> </div>
                         </div>
                     </div>
-                    <div class="inbox_chat">
-                        <div class="chat_list active_chat">
-                            <div class="chat_people">
-                                <div class="chat_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
-                                <div class="chat_ib">
-                                    <h5>Sunil Rajput <span class="chat_date">Dec 25</span></h5>
-                                    <p>Test, which is a new approach to have all solutions
-                                        astrology under one roof.</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="chat_list">
-                            <div class="chat_people">
-                                <div class="chat_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
-                                <div class="chat_ib">
-                                    <h5>Sunil Rajput <span class="chat_date">Dec 25</span></h5>
-                                    <p>Test, which is a new approach to have all solutions
-                                        astrology under one roof.</p>
-                                </div>
-                            </div>
-                        </div>
+                    <div id="inbox_chat" class="inbox_chat">
                     </div>
                 </div>
                 <div class="mesgs">
@@ -362,7 +342,15 @@ img{ max-width:100%;}
         		
         	}
 			if(respone.typeRequest == 'getRelationship'){
-        		showFriendList(respone.content);
+				console.log(respone)
+				friendList = respone.content;
+		    	currentUser = respone.content[0].id;
+		    	console.log(friendList);
+		    	console.log('currentUser:' + currentUser);
+		    	for (i in friendList) {
+		    		console.log(respone.content[i]);
+		    		showFriendList(respone.content[i]);
+				}
         		getMessage();
         	}
 			if(respone.typeRequest == 'getMessageFromUser'){
@@ -377,77 +365,9 @@ img{ max-width:100%;}
         //textAreaMessage.value += "Error... " + message + " \n";
     }
     
-    function showFriendList(list){
-    	friendList = list;
-    	currentUser = list[0].id;
-    }
-    
     function showMessageRealTime(message){
     	showFriendMessage(message);
     }
-    
-    function showFriendMessage(message){
-    	console.log(message);
-    	var element = document.getElementById("msg_history");
-    	
-    	var fristDiv = document.createElement("div");
-    	fristDiv.classList.add('incoming_msg');
-    	
-    	var secondDiv = document.createElement("div");
-    	secondDiv.classList.add('incoming_msg_img');
-    	
-    	var image = document.createElement("img");
-    	image.src = "https://ptetutorials.com/images/user-profile.png";
-   		image.alt = "sunil";
-   		secondDiv.appendChild(image);
-    	fristDiv.appendChild(secondDiv);
-
-    	
-    	var thirdDiv = document.createElement("div");
-    	thirdDiv.classList.add('received_msg');
-    	fristDiv.appendChild(thirdDiv);
-    	
-    	var fourdDiv = document.createElement("div");
-    	fourdDiv.classList.add('received_withd_msg');
-    	thirdDiv.appendChild(fourdDiv);
-    	
-    	
-    	var para = document.createElement("p");
-    	fourdDiv.appendChild(para);
-    	var node = document.createTextNode(message);
-    	para.appendChild(node);
-
-    	var s = document.createElement("span");
-    	s.classList.add('time_date');
-    	
-    	var node2 = document.createTextNode("11:01 AM | June 9");
-    	s.appendChild(node2);
-    	fourdDiv.appendChild(s);
-    	
-    	element.appendChild(fristDiv);
-    }
-    
-    function showMyMessage(message){
-    	var element = document.getElementById("msg_history");
-    	var fristDiv = document.createElement("div");
-    	fristDiv.classList.add('outgoing_msg');
-    	var secondDiv = document.createElement("div");
-    	secondDiv.classList.add('sent_msg');
-    	fristDiv.appendChild(secondDiv);
-
-    	var para = document.createElement("p");
-    	secondDiv.appendChild(para);
-    	var node = document.createTextNode(message);
-    	para.appendChild(node);
-
-    	var s = document.createElement("span");
-    	s.classList.add('time_date');
-    	secondDiv.appendChild(s);
-    	var node2 = document.createTextNode("11:01 AM | June 9");
-    	s.appendChild(node2);
-    	element.appendChild(fristDiv);
-    }
-    
     
     function getMessage(){
     	 if (typeof websocket != 'undefined' &&
@@ -476,7 +396,7 @@ img{ max-width:100%;}
             }
             console.log(message);
             websocket.send(JSON.stringify(message));
-           
+            showMyMessage(content);
         }
     }
     
@@ -510,6 +430,7 @@ img{ max-width:100%;}
     
     
     </script>
+    <script type="text/javascript" src="draw.js"></script>
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>

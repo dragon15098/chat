@@ -49,14 +49,15 @@ public class ChatRoomServerEndpoint {
 				dto.id = Integer.parseInt(messageFromUser.token);
 
 				getFriendList(userSession, dto);
-				//loadMessage(userSession, Integer.parseInt(messageFromUser.token),messageFromUser.toUser);
+				// loadMessage(userSession,
+				// Integer.parseInt(messageFromUser.token),messageFromUser.toUser);
 			}
 
 		} else {
 			if ("GET_MESSAGE".equals(messageFromUser.function)) {
-				loadMessage(userSession, Integer.parseInt(messageFromUser.token),  messageFromUser.toUser);
-			} 
-			if( "SEND_MESSAGE".equals(messageFromUser.function)) {		
+				loadMessage(userSession, Integer.parseInt(messageFromUser.token), messageFromUser.toUser);
+			}
+			if ("SEND_MESSAGE".equals(messageFromUser.function)) {
 				Integer toUserId = messageFromUser.toUser;
 				Integer fromUserId = Integer.parseInt(messageFromUser.token);
 				MessageDTO messageDTO = new MessageDTO();
@@ -64,7 +65,7 @@ public class ChatRoomServerEndpoint {
 				messageDTO.fromUserId = fromUserId;
 				messageDTO.content = messageFromUser.content;
 				saveMessageToDB(messageDTO);
-				Session sessionUserReceiver = userMapping.get("2");
+				Session sessionUserReceiver = userMapping.get(messageDTO.toUserId.toString());
 				if (sessionUserReceiver != null) {
 					if (sessionUserReceiver.isOpen()) {
 						sendMessageToOnlineUser(sessionUserReceiver, messageFromUser.content);
@@ -81,8 +82,7 @@ public class ChatRoomServerEndpoint {
 		messageRespone.typeRequest = "getMessageFromUser";
 		ResponeSender.sentRespone(receiverSession, messageRespone);
 	}
-	
-	
+
 	private void getFriendList(Session userSession, UserDTO dto) {
 		List<UserDTO> dtos = relationshipDAOImpl.findRelationshipByUserId(dto);
 		MessageRespone<List<UserDTO>> respone = new MessageRespone<>();
@@ -119,7 +119,8 @@ public class ChatRoomServerEndpoint {
 
 	@OnClose
 	public void handleClose(Session session) {
-		System.out.println("handle Close");
+		userMapping.entrySet().removeIf(entry -> (session.equals(entry.getValue()))); 
+
 	}
 
 	@OnError
