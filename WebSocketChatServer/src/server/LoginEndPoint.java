@@ -12,7 +12,7 @@ import javax.websocket.server.ServerEndpoint;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import models.dto.LoginRespone;
-import models.dto.UserDTO;
+import models.dto.User;
 import repository.impl.UserDAOImpl;
 
 @ServerEndpoint(value = "/login")
@@ -27,11 +27,11 @@ public class LoginEndPoint {
 	@OnMessage
 	public void handleMessage(String message, Session userSession) throws IOException {
 		ObjectMapper mapper = new ObjectMapper();
-		UserDTO user = mapper.readValue(message, UserDTO.class);
+		User user = mapper.readValue(message, User.class);
 		if (userDaoImpl == null) {
 			userDaoImpl = new UserDAOImpl();
 		}
-		UserDTO dto = userDaoImpl.findUser(user.username, user.username);
+		User dto = userDaoImpl.findUser(user.username, user.username);
 		LoginRespone loginRespone = new LoginRespone();
 		if (dto != null) {
 			String cookie = dto.username;

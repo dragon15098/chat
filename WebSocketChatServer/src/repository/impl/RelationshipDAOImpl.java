@@ -3,16 +3,18 @@ package repository.impl;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import models.dto.UserDTO;
+import models.dto.Relationship;
+import models.dto.User;
 import repository.RelationshipDAO;
 
 public class RelationshipDAOImpl extends DAO implements RelationshipDAO {
 
 	@Override
-	public List<UserDTO> findRelationshipByUserId(UserDTO user) {
+	public List<User> findRelationshipByUserId(User user) {
 		if(user.id!=null) {
 			String query = "SELECT * FROM relationship r JOIN app_user u  WHERE (r.frist_user_id = ? OR r.second_user_id = ?) AND r.status = 1 ";
 			PreparedStatement preparedStatement;
@@ -46,16 +48,16 @@ public class RelationshipDAOImpl extends DAO implements RelationshipDAO {
 					ps.setInt(index++, id);
 				}
 				ResultSet result = ps.executeQuery();
-				List<UserDTO> userDTOs = new ArrayList<>();
+				List<User> Users = new ArrayList<>();
 				while(result.next()) {
-					UserDTO userDTO = new UserDTO();
-					userDTO.id = result.getInt(1);
-					userDTO.username = result.getString(2);
-					userDTO.firstName = result.getString(4);
-					userDTO.lastName = result.getString(5);
-					userDTOs.add(userDTO);
+					User User = new User();
+					User.id = result.getInt(1);
+					User.username = result.getString(2);
+					User.fristname = result.getString(4);
+					User.lastname = result.getString(5);
+					Users.add(User);
 				}
-				return userDTOs;
+				return Users;
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -66,4 +68,46 @@ public class RelationshipDAOImpl extends DAO implements RelationshipDAO {
 		
 	}
 
+	  @Override
+	    public void addFriend(Relationship relationship) {
+	        String insert = "INSERT INTO relationship (from_user_id, to_user_id, status) VALUES (?, ?, ?)";
+	        try {
+	            PreparedStatement preparedStatement = getConnection().prepareStatement(insert);
+	            preparedStatement.setInt(1, relationship.fromUserId);
+	            preparedStatement.setInt(1, relationship.toUserId);
+	            preparedStatement.setInt(1, 0);
+	            int affectedRows = preparedStatement.executeUpdate();
+	            if (affectedRows == 0) {
+	                throw new SQLException("Creating user failed, no rows affected.");
+	            }
+
+	            try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
+	                if (generatedKeys.next()) {
+	                    relationship.id = generatedKeys.getInt(1);
+	                } else {
+	                    throw new SQLException("Creating failed, no ID obtained.");
+	                }
+	            }
+	        } catch (SQLException ex) {
+	        	  ex.printStackTrace();
+	        }
+
+	    }
+
+	    @Override
+	    public void acceptFriend(Relationship relationship) {
+	        String updateSQL = "UPDATE relationship SET status = 1 WHERE id = ?";
+	        try {
+	            PreparedStatement preparedStatement = getConnection().prepareStatement(updateSQL, Statement.RETURN_GENERATED_KEYS);
+	            preparedStatement.setInt(1, relationship.id);
+	            int affectedRows = preparedStatement.executeUpdate();
+	            if (affectedRows == 1) {
+	                relationship.status = 1;
+	            }
+	        } catch (SQLException ex) {
+	            ex.printStackTrace();
+	        }
+
+	    }
+	
 }

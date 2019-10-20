@@ -3,6 +3,8 @@
  */
 
 function clearMessage(){
+	currentUser = null;
+	currentGroup = null;
 	  var e = document.getElementById("msg_history"); 
 	 //e.firstElementChild can be used. 
     var child = e.lastElementChild;  
@@ -12,18 +14,55 @@ function clearMessage(){
     } 
 }
 
-function showFriendList(friend) {
+function showGroup(group) {
 	var element = document.getElementById("inbox_chat");
 
 	var fristDiv = document.createElement("div");
 	fristDiv.classList.add('chat_list');
-	fristDiv.id = "" + friend.id;
+	fristDiv.id = "group: " + group.id;
 	fristDiv.onclick = function() {
 		clearMessage();
-		currentUser = fristDiv.id;
+		currentGroup = group.id;
+		getMessageGroup();
+	};
+	var secondDiv = addNewDivTo(fristDiv, 'chat_people');
+	var thirdDiv = addNewDivTo(secondDiv, 'chat_img');
+	var img = addNewImgTo(thirdDiv, "user-profile.png", "sunil");
+	var fourDiv = addNewDivTo(secondDiv, 'chat_ib');
+
+	var h = document.createElement("h5");
+	fourDiv.appendChild(h);
+	var node = document
+			.createTextNode(group.content);
+	h.appendChild(node);
+
+	var s = document.createElement("span");
+	s.classList.add('chat_date');
+
+	var node2 = document.createTextNode("Dec 25");
+	s.appendChild(node2);
+	h.appendChild(s);
+
+	var p = document.createElement("p");
+
+	var node3 = document
+			.createTextNode("Test, which is a new approach to have all solutions astrology under one roof.");
+	p.appendChild(node3);
+	fourDiv.appendChild(p);
+	element.appendChild(fristDiv);
+}
+function showFriendList(friend) {
+	console.log(friend);
+	var element = document.getElementById("inbox_chat");
+
+	var fristDiv = document.createElement("div");
+	fristDiv.classList.add('chat_list');
+	fristDiv.id = "friend: " + friend.id;
+	fristDiv.onclick = function() {
+		clearMessage();
+		currentUser = friend.id;
 		getMessage();
 	};
-
 	var secondDiv = document.createElement("div");
 	secondDiv.classList.add('chat_people');
 	fristDiv.appendChild(secondDiv);
@@ -33,7 +72,7 @@ function showFriendList(friend) {
 	secondDiv.appendChild(thirdDiv);
 
 	var img = document.createElement("img");
-	img.src = "https://ptetutorials.com/images/user-profile.png";
+	img.src = "user-profile.png";
 	img.alt = "sunil";
 	thirdDiv.appendChild(img);
 
@@ -44,7 +83,7 @@ function showFriendList(friend) {
 	var h = document.createElement("h5");
 	fourDiv.appendChild(h);
 	var node = document
-			.createTextNode(friend.firstName + " " + friend.lastName);
+			.createTextNode(friend.fristname + " " + friend.lastname);
 	h.appendChild(node);
 
 	var s = document.createElement("span");
@@ -85,7 +124,6 @@ function showMyMessage(message) {
 };
 
 function showFriendMessage(message) {
-	console.log(message);
 	var element = document.getElementById("msg_history");
 
 	var fristDiv = document.createElement("div");
@@ -122,3 +160,18 @@ function showFriendMessage(message) {
 
 	element.appendChild(fristDiv);
 };
+
+function addNewDivTo(parent, style){
+	var div = document.createElement("div");
+	div.classList.add(style);
+	parent.appendChild(div);
+	return div;
+}
+function addNewImgTo(parent, src, alt){
+	var img = document.createElement("img");
+	img.src = src;
+	img.alt = alt;
+	parent.appendChild(img);
+	return img;
+}
+

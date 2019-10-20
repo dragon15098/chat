@@ -1,7 +1,9 @@
 package repository;
 
-import models.dto.UserDTO;
+import models.dto.User;
 
 public interface UserDAO {
-	UserDTO findUser(String username, String password);
+	User findUser(String username, String password);
+
+	void createUser(User user);
 }

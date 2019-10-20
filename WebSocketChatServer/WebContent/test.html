@@ -135,8 +135,8 @@ table {
 <html>
 
 <head>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <script  type="text/javascript" src="jquery.js"></script>
+    <link rel="stylesheet" href="bootstrap.css">
     <title>Demo websocket</title>
 </head>
 <style>
@@ -309,6 +309,7 @@ img{ max-width:100%;}
     var cookie = window.location.hash.substring(1);
     var currentUser;
     var friendList;
+    var currentGroup;
     var websocket = new WebSocket(
         "ws://localhost:8080/WebSocketChatServer/chatRoomServer");
     websocket.onopen = function(message) {
@@ -339,23 +340,43 @@ img{ max-width:100%;}
         				showFriendMessage(respone.content[i].content);
         			}
         		}
-        		
+        	}
+        	if(respone.typeRequest == 'getMessageGroup'){
+        		for (i in respone.content) {
+        			if(respone.content[i].fromUserId == cookie){
+        				showMyMessage(respone.content[i].content);
+        			}
+        			else{
+        				showFriendMessage(respone.content[i].content);
+        			}
+        		}
         	}
 			if(respone.typeRequest == 'getRelationship'){
-				console.log(respone)
+				
 				friendList = respone.content;
 		    	currentUser = respone.content[0].id;
 		    	console.log(friendList);
 		    	console.log('currentUser:' + currentUser);
 		    	for (i in friendList) {
-		    		console.log(respone.content[i]);
 		    		showFriendList(respone.content[i]);
 				}
         		getMessage();
         	}
+			if(respone.typeRequest == 'getGroupList'){
+				groupList = respone.content;
+		    	for (i in groupList) {
+		    		console.log(groupList[i])
+		    		showGroup(groupList[i]);
+				}		
+        	}
 			if(respone.typeRequest == 'getMessageFromUser'){
         		showMessageRealTime(respone.content);
         	}
+			if(respone.typeRequest == 'getMessageGroupFromUser'){
+        		showMessageRealTime(respone.content);
+        	}
+			
+			
         }
     }
     function processClose(message) {
@@ -382,21 +403,47 @@ img{ max-width:100%;}
     	           
     	        }
     }
-    
+    function getMessageGroup(){
+   	 if (typeof websocket != 'undefined' &&
+   	            websocket.readyState == WebSocket.OPEN) {
+   	            var message = {
+   	                'toGroupUser': currentGroup,
+   	                'token': cookie,
+   	                'function': 'GET_MESSAGE_GROUP'
+   	            }
+   	            console.log(message);
+   	            websocket.send(JSON.stringify(message));   
+   	        }
+   }
     function sendMessage() {
         if (typeof websocket != 'undefined' &&
             websocket.readyState == WebSocket.OPEN) {
-            var content = $('#textMessage').val();
-            $('#textMessage').val("");
-            var message = {
-                'toUser': currentUser,
-                'token': cookie,
-                'content': content,
-                'function': 'SEND_MESSAGE'
-            }
-            console.log(message);
-            websocket.send(JSON.stringify(message));
-            showMyMessage(content);
+        	if(currentUser!=null){
+        		var content = $('#textMessage').val();
+                $('#textMessage').val("");
+                var message = {
+                    'toUser': currentUser,
+                    'token': cookie,
+                    'content': content,
+                    'function': 'SEND_MESSAGE'
+                }
+                console.log(message);
+                websocket.send(JSON.stringify(message));
+                showMyMessage(content);
+        	}
+        	else{
+        		var content = $('#textMessage').val();
+                $('#textMessage').val("");
+                var message = {
+                    'toGroupUser': currentGroup,
+                    'token': cookie,
+                    'content': content,
+                    'function': 'SEND_MESSAGE_TO_GROUP'
+                }
+                console.log(message);
+                websocket.send(JSON.stringify(message));
+                showMyMessage(content);
+        	}
         }
     }
     
@@ -431,9 +478,9 @@ img{ max-width:100%;}
     
     </script>
     <script type="text/javascript" src="draw.js"></script>
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="slim.js"></script>
+    <script type="text/javascript" src="popper.js"></script>
+    <script type="text/javascript" src="bootstrap.js"></script>
 </body>
 
 </html>

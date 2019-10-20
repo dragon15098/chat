@@ -1,6 +1,7 @@
 package server;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -13,17 +14,22 @@ import javax.websocket.server.ServerEndpoint;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import models.dto.Group;
 import models.dto.MessageDTO;
+import models.dto.MessageGroup;
 import models.dto.MessageRespone;
-import models.dto.UserDTO;
+import models.dto.User;
+import repository.impl.GroupDAOImpl;
 import repository.impl.MessageDAOImpl;
+import repository.impl.MessageGroupDAOImpl;
 import repository.impl.RelationshipDAOImpl;
 import request.Request;
 
 @ServerEndpoint(value = "/chatRoomServer")
 public class ChatRoomServerEndpoint {
 	public RelationshipDAOImpl relationshipDAOImpl;
-
+	public MessageGroupDAOImpl messageGroupDAOImpl;
+	public GroupDAOImpl groupDAOImpl;
 	public MessageDAOImpl messageDAOImpl;
 	// static Set<Session> users = Collections.synchronizedSet(new HashSet<>());
 
@@ -45,47 +51,120 @@ public class ChatRoomServerEndpoint {
 			}
 			// tao connection
 			if ("START_CONNECTION".equals(messageFromUser.function)) {
-				UserDTO dto = new UserDTO();
+				User dto = new User();
 				dto.id = Integer.parseInt(messageFromUser.token);
 
 				getFriendList(userSession, dto);
-				// loadMessage(userSession,
-				// Integer.parseInt(messageFromUser.token),messageFromUser.toUser);
+				getGroupList(userSession, dto);
 			}
-
 		} else {
 			if ("GET_MESSAGE".equals(messageFromUser.function)) {
 				loadMessage(userSession, Integer.parseInt(messageFromUser.token), messageFromUser.toUser);
 			}
-			if ("SEND_MESSAGE".equals(messageFromUser.function)) {
-				Integer toUserId = messageFromUser.toUser;
-				Integer fromUserId = Integer.parseInt(messageFromUser.token);
-				MessageDTO messageDTO = new MessageDTO();
-				messageDTO.toUserId = toUserId;
-				messageDTO.fromUserId = fromUserId;
-				messageDTO.content = messageFromUser.content;
+			if ("GET_MESSAGE_GROUP".equals(messageFromUser.function)) {
+				loadMessageGroup(userSession, Integer.parseInt(messageFromUser.token), messageFromUser.toGroupUser);
+			}
+			if ("SEND_MESSAGE_TO_USER".equals(messageFromUser.function)) {
+				MessageDTO messageDTO = createMessage(messageFromUser);
 				saveMessageToDB(messageDTO);
-				Session sessionUserReceiver = userMapping.get(messageDTO.toUserId.toString());
-				if (sessionUserReceiver != null) {
-					if (sessionUserReceiver.isOpen()) {
-						sendMessageToOnlineUser(sessionUserReceiver, messageFromUser.content);
-					}
-				}
+				sendMessageToOnlineUser(messageDTO);
+			}
+			if ("SEND_MESSAGE_TO_GROUP".equals(messageFromUser.function)) {
+				MessageGroup messageGroup = createMessageGroup(messageFromUser);
+				saveMessageToDB(messageGroup);
+				sendMessageToOnlineUser(messageGroup);
 			}
 		}
 	}
 
-	private void sendMessageToOnlineUser(Session receiverSession, String message) {
-		MessageRespone<String> messageRespone = new MessageRespone<>();
-		messageRespone.code = 200;
-		messageRespone.content = message;
-		messageRespone.typeRequest = "getMessageFromUser";
-		ResponeSender.sentRespone(receiverSession, messageRespone);
+	private void loadMessageGroup(Session userSession, int parseInt, Integer toGroupUser) {
+		if (messageGroupDAOImpl == null) {
+			messageGroupDAOImpl = new MessageGroupDAOImpl();
+		}
+		List<MessageGroup> messageGroups = messageGroupDAOImpl.getMessageGroup(toGroupUser);
+		MessageRespone<List<MessageGroup>> responeMessage = new MessageRespone<>();
+		responeMessage.code = 200;
+		responeMessage.content = messageGroups;
+		responeMessage.typeRequest = "getMessageGroup";
+		ResponeSender.sentRespone(userSession, responeMessage);
 	}
 
-	private void getFriendList(Session userSession, UserDTO dto) {
-		List<UserDTO> dtos = relationshipDAOImpl.findRelationshipByUserId(dto);
-		MessageRespone<List<UserDTO>> respone = new MessageRespone<>();
+	private void getGroupList(Session userSession, User user) {
+		if (groupDAOImpl == null) {
+			groupDAOImpl = new GroupDAOImpl();
+		}
+		List<Group> groups = groupDAOImpl.getGroupsHaveUser(user);
+		MessageRespone<List<Group>> respone = new MessageRespone<>();
+		respone.code = 200;
+		respone.content = groups;
+		respone.typeRequest = "getGroupList";
+		ResponeSender.sentRespone(userSession, respone);
+
+	}
+
+	private void saveMessageToDB(MessageGroup messageGroup) {
+		if (messageGroupDAOImpl == null) {
+			messageGroupDAOImpl = new MessageGroupDAOImpl();
+		}
+		messageGroupDAOImpl.insert(messageGroup);
+	}
+
+	private void sendMessageToOnlineUser(MessageGroup messageGroup) {
+		messageGroup.userIds.forEach(id -> {
+			String idStr = id.toString();
+			if(id!=messageGroup.fromUserId) {
+				Session sessionUserReceiver = userMapping.get(idStr);
+				if (sessionUserReceiver != null) {
+					if (sessionUserReceiver.isOpen()) {
+						MessageRespone<String> messageRespone = new MessageRespone<>();
+						messageRespone.code = 200;
+						messageRespone.content = messageGroup.content;
+						messageRespone.typeRequest = "getMessageGroupFromUser";
+						ResponeSender.sentRespone(sessionUserReceiver, messageRespone);
+					}
+				}
+			}
+		});
+	}
+
+	private MessageGroup createMessageGroup(Request messageFromUser) {
+		if(groupDAOImpl == null) {
+			groupDAOImpl = new GroupDAOImpl();
+		} 
+		MessageGroup messageGroup = new MessageGroup();
+		messageGroup.fromUserId = Integer.parseInt(messageFromUser.token);
+		messageGroup.userIds = groupDAOImpl.getUserIdIn(messageFromUser.toGroupUser);
+		messageGroup.groupId = messageFromUser.toGroupUser;
+		messageGroup.content = messageFromUser.content;
+		return messageGroup;
+	}
+
+	private MessageDTO createMessage(Request messageFromUser) {
+		Integer toUserId = messageFromUser.toUser;
+		Integer fromUserId = Integer.parseInt(messageFromUser.token);
+		MessageDTO messageDTO = new MessageDTO();
+		messageDTO.toUserId = toUserId;
+		messageDTO.fromUserId = fromUserId;
+		messageDTO.content = messageFromUser.content;
+		return messageDTO;
+	}
+
+	private void sendMessageToOnlineUser(MessageDTO messageDTO) {
+		Session sessionUserReceiver = userMapping.get(messageDTO.toUserId.toString());
+		if (sessionUserReceiver != null) {
+			if (sessionUserReceiver.isOpen()) {
+				MessageRespone<String> messageRespone = new MessageRespone<>();
+				messageRespone.code = 200;
+				messageRespone.content = messageDTO.content;
+				messageRespone.typeRequest = "getMessageFromUser";
+				ResponeSender.sentRespone(sessionUserReceiver, messageRespone);
+			}
+		}
+	}
+
+	private void getFriendList(Session userSession, User dto) {
+		List<User> dtos = relationshipDAOImpl.findRelationshipByUserId(dto);
+		MessageRespone<List<User>> respone = new MessageRespone<>();
 		respone.code = 200;
 		respone.content = dtos;
 		respone.typeRequest = "getRelationship";
@@ -119,7 +198,7 @@ public class ChatRoomServerEndpoint {
 
 	@OnClose
 	public void handleClose(Session session) {
-		userMapping.entrySet().removeIf(entry -> (session.equals(entry.getValue()))); 
+		userMapping.entrySet().removeIf(entry -> (session.equals(entry.getValue())));
 
 	}
 
