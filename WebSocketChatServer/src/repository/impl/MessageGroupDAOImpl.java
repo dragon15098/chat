@@ -12,7 +12,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import models.dto.Group;
 import models.dto.MessageGroup;
 import repository.MessageGroupDAO;
 

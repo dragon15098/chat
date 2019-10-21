@@ -112,6 +112,7 @@ function showMyMessage(message) {
 
 	var para = document.createElement("p");
 	secondDiv.appendChild(para);
+	
 	var node = document.createTextNode(message);
 	para.appendChild(node);
 
@@ -128,23 +129,17 @@ function showFriendMessage(message) {
 
 	var fristDiv = document.createElement("div");
 	fristDiv.classList.add('incoming_msg');
-
-	var secondDiv = document.createElement("div");
-	secondDiv.classList.add('incoming_msg_img');
+	
+	var secondDiv = addNewDivTo(fristDiv, 'incoming_msg_img');
 
 	var image = document.createElement("img");
-	image.src = "https://ptetutorials.com/images/user-profile.png";
+	image.src = "user-profile.png";
 	image.alt = "sunil";
 	secondDiv.appendChild(image);
-	fristDiv.appendChild(secondDiv);
-
-	var thirdDiv = document.createElement("div");
-	thirdDiv.classList.add('received_msg');
-	fristDiv.appendChild(thirdDiv);
-
-	var fourdDiv = document.createElement("div");
-	fourdDiv.classList.add('received_withd_msg');
-	thirdDiv.appendChild(fourdDiv);
+	
+	var thirdDiv = addNewDivTo(fristDiv, 'received_msg')
+	
+	var fourdDiv = addNewDivTo(thirdDiv, 'received_withd_msg');
 
 	var para = document.createElement("p");
 	fourdDiv.appendChild(para);

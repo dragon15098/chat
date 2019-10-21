@@ -4,6 +4,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 import models.dto.User;
 import repository.UserDAO;
@@ -58,5 +60,33 @@ public class UserDAOImpl extends DAO implements UserDAO {
 			e.printStackTrace();
 		}
 
+	}
+
+	@Override
+	public List<User> findUserByName(String name) {
+		String selectSql = "SELECT * FROM app_user WHERE user_name LIKE ? OR frist_name LIKE ? OR last_name LIKE ?";
+		PreparedStatement preparedStatement;
+		try {
+			preparedStatement = getConnection().prepareStatement(selectSql);
+			preparedStatement.setString(1, "%" + name + "%");
+			preparedStatement.setString(2, "%" + name + "%");
+			preparedStatement.setString(3, "%" + name + "%");
+			ResultSet resultSet = preparedStatement.executeQuery();
+			List<User> result = new ArrayList<User>();
+			while(resultSet.next()) {
+				User user = new User();
+				user.id= resultSet.getInt(1);
+				user.username= resultSet.getString(1);
+				user.fristname= resultSet.getString(2);
+				user.lastname= resultSet.getString(3);
+				result.add(user);
+			}
+			return result;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return null;
 	}
 }
