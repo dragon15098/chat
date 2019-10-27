@@ -58,6 +58,7 @@ public class MessageDAOImpl extends DAO implements MessageDAO{
 					messageDTO.fromUserId = resultSet.getInt(2);
 					messageDTO.toUserId = resultSet.getInt(3);
 					messageDTO.content = resultSet.getString(4);
+					messageDTO.sendDate = resultSet.getTimestamp(5);
 					messages.add(messageDTO);
 					
 				}

@@ -6,7 +6,7 @@ import models.dto.Relationship;
 import models.dto.User;
 
 public interface RelationshipDAO {
-	List<User> findRelationshipByUserId(User user);
+	List<User> findRelationshipByUserId(User user, String textSearch);
 
     void addFriend(Relationship relationship);
 

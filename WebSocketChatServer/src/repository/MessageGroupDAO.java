@@ -7,7 +7,6 @@ package repository;
 
 import java.util.List;
 
-import models.dto.Group;
 import models.dto.MessageGroup;
 
 /**

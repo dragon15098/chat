@@ -14,9 +14,9 @@ import repository.RelationshipDAO;
 public class RelationshipDAOImpl extends DAO implements RelationshipDAO {
 
 	@Override
-	public List<User> findRelationshipByUserId(User user) {
+	public List<User> findRelationshipByUserId(User user, String textSearch) {
 		if(user.id!=null) {
-			String query = "SELECT * FROM relationship r JOIN app_user u  WHERE (r.frist_user_id = ? OR r.second_user_id = ?) AND r.status = 1 ";
+			String query = "SELECT * FROM relationship r WHERE (r.frist_user_id = ? OR r.second_user_id = ?) AND r.status = 1 ";
 			PreparedStatement preparedStatement;
 			try {
 				preparedStatement = getConnection().prepareStatement(query);
@@ -40,10 +40,24 @@ public class RelationshipDAOImpl extends DAO implements RelationshipDAO {
 				    builder.append("?,");
 				}
 
-				String queryGetInfo = "select * from app_user where id in (" 
+				String queryGetInfo = "select * from app_user where 1 = 1 AND ";
+				if(!"".equals(textSearch)) {
+					queryGetInfo += " frist_name LIKE (?) OR last_name LIKE(?)  AND ";
+				}
+				
+				String whereId = " id in (" 
 				               + builder.deleteCharAt( builder.length() -1 ).toString() + ")";
+				
+				queryGetInfo += whereId;
 				PreparedStatement ps = getConnection().prepareStatement(queryGetInfo);
 				int index = 1;
+				if(!"".equals(textSearch)) {
+					ps.setString(1, "%" + textSearch + "%");
+					ps.setString(2, "%" + textSearch + "%");
+					index = 3;
+				}
+				
+				
 				for(Integer id : friendIds) {
 					ps.setInt(index++, id);
 				}

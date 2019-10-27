@@ -13,7 +13,9 @@ import models.dto.User;
 import repository.GroupDAO;
 
 public class GroupDAOImpl extends DAO implements GroupDAO {
-
+	
+	private RelationshipDAOImpl relationshipDAOImpl;
+	
 	@Override
 	public List<Group> getGroupsHaveUser(User user) {
 		String selectSql = "SELECT * FROM group_chat WHERE id in (SELECT group_id FROM group_chat_detail WHERE user_id = ?);";
@@ -59,9 +61,10 @@ public class GroupDAOImpl extends DAO implements GroupDAO {
 
 	@Override
 	public void addUserToGroup(GroupChatDetail groupChatDetail) {
-		String insertSql = "INSERT INTO group_chat_detal (group_id, user_id) VALUES (?, ?)";
+		String insertSql = "INSERT INTO group_chat_detail (group_id, user_id) VALUES (?, ?)";
 		try {
-			PreparedStatement preparedStatement = getConnection().prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS);
+			PreparedStatement preparedStatement = getConnection().prepareStatement(insertSql,
+					Statement.RETURN_GENERATED_KEYS);
 			preparedStatement.setInt(1, groupChatDetail.groupId);
 			preparedStatement.setInt(2, groupChatDetail.userId);
 			int affectedRows = preparedStatement.executeUpdate();
@@ -92,9 +95,58 @@ public class GroupDAOImpl extends DAO implements GroupDAO {
 				throw new SQLException("Creating user failed, no rows affected.");
 			}
 		} catch (SQLException e) {
-		
+
 			e.printStackTrace();
-		}	
+		}
+	}
+
+	@Override
+	public List<User> findUserInGroup(Integer groupId) {
+		String sqlSelect = "SELECT au.* FROM group_chat_detail gcd JOIN app_user au ON au.id = gcd.user_id WHERE gcd.group_id = ?";
+		try {
+			PreparedStatement preparedStatement = getConnection().prepareStatement(sqlSelect);
+			preparedStatement.setInt(1, groupId);
+			ResultSet resultSet = preparedStatement.executeQuery();
+			List<User> users = new ArrayList<>();
+			while(resultSet.next()) {
+				User user = new User();
+				user.id= resultSet.getInt(1);
+				user.username = resultSet.getString(2);
+				user.fristname = resultSet.getString(3);
+				user.lastname = resultSet.getString(4);
+				users.add(user);
+			}
+			return users;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	@Override
+	public List<User> findUserNotInGroup(Integer groupId, Integer userId, String textSearch) {
+		if(relationshipDAOImpl==null) {
+			relationshipDAOImpl = new RelationshipDAOImpl();
+		}
+		User user = new User();
+		user.id = userId;
+		List<User> friends =  relationshipDAOImpl.findRelationshipByUserId(user, textSearch);
+		List<User> userInGroup = findUserInGroup(groupId);
+		List<User> result = new ArrayList<>();
+		friends.forEach(friend -> {
+			boolean add = true;
+			for(User u : userInGroup) {
+				if(u.id == friend.id) {
+					add = false;
+				}
+			}
+			if(add) {
+				result.add(friend);
+			}
+		});
+		
+		return result;
 	}
 
 }

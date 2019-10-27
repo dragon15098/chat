@@ -1,7 +1,6 @@
 package server;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -15,6 +14,7 @@ import javax.websocket.server.ServerEndpoint;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import models.dto.Group;
+import models.dto.GroupChatDetail;
 import models.dto.MessageDTO;
 import models.dto.MessageGroup;
 import models.dto.MessageRespone;
@@ -37,6 +37,7 @@ public class ChatRoomServerEndpoint {
 
 	@OnOpen
 	public void handleOpen(Session session) {
+		System.out.println("Client connect");
 	}
 
 	@OnMessage
@@ -74,7 +75,42 @@ public class ChatRoomServerEndpoint {
 				saveMessageToDB(messageGroup);
 				sendMessageToOnlineUser(messageGroup);
 			}
+			if ("SEARCH_FRIEND".equals(messageFromUser.function)) {
+				if(groupDAOImpl!=null) {
+					groupDAOImpl = new GroupDAOImpl();
+				}
+				List<User> users = groupDAOImpl.findUserNotInGroup(1, 1, messageFromUser.textSearch);
+				sendResultSearch(userSession, users);
+			}
+			if ("ADD_FRIENDS_TO_GROUP".equals(messageFromUser.function)) {
+				if(groupDAOImpl==null) {
+					groupDAOImpl = new GroupDAOImpl();
+				}
+				for(Integer id : messageFromUser.friendIds) {
+					GroupChatDetail groupChatDetail = new GroupChatDetail();
+					groupChatDetail.groupId = messageFromUser.toGroupUser;
+					groupChatDetail.userId = id;
+					groupDAOImpl.addUserToGroup(groupChatDetail);
+				}
+				sendMessageInsertSuccess(userSession);
+			}
 		}
+	}
+
+	private void sendMessageInsertSuccess(Session userSession) {
+		MessageRespone messageRespone = new MessageRespone<>();
+		messageRespone.typeRequest = "addSuccess";
+		messageRespone.code = 200;
+		ResponeSender.sentRespone(userSession, messageRespone);
+		
+	}
+
+	private void sendResultSearch(Session userSession, List<User> users) {
+		MessageRespone<List<User>> messageRespone = new MessageRespone<>();
+		messageRespone.content = users;
+		messageRespone.typeRequest = "getResultSearch";
+		messageRespone.code = 200;
+		ResponeSender.sentRespone(userSession, messageRespone);
 	}
 
 	private void loadMessageGroup(Session userSession, int parseInt, Integer toGroupUser) {
@@ -163,7 +199,7 @@ public class ChatRoomServerEndpoint {
 	}
 
 	private void getFriendList(Session userSession, User dto) {
-		List<User> dtos = relationshipDAOImpl.findRelationshipByUserId(dto);
+		List<User> dtos = relationshipDAOImpl.findRelationshipByUserId(dto, "");
 		MessageRespone<List<User>> respone = new MessageRespone<>();
 		respone.code = 200;
 		respone.content = dtos;

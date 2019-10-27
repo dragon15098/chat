@@ -5,6 +5,8 @@
 <script type="text/javascript" src="jquery.js"></script>
 <link rel="stylesheet" href="bootstrap.css">
 <link rel="stylesheet" href="styles.css">
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <title>Demo websocket</title>
 </head>
 
@@ -15,25 +17,32 @@
 		<!-- Modal content -->
 		<div class="modal-content">
 			<span class="close">&times;</span>
-			<p>Some text in the Modal..</p>
-			<div class="inbox_people">
-				<div class="headind_srch">
-					<div class="recent_heading">
-						<h4>Recent</h4>
-					</div>
-					<div class="srch_bar">
-						<div class="stylish-input-group">
-							<input type="text" class="search-bar" placeholder="Search">
-							<span class="input-group-addon">
-								<button type="button">
-									<i class="fa fa-search" aria-hidden="true"></i>
-								</button>
-							</span>
-						</div>
-					</div>
-				</div>
-				<!-- <div id="inbox_chat" class="inbox_chat"></div> -->
+			<p>Add friend to group</p>
+
+			<div class="example">
+				<input id="textSearch" type="text" placeholder="Search.."
+					name="search">
+				<button onclick="searchFriend()" >
+					<i class="fa fa-search"></i>
+				</button>
+				<button onclick="addFriendToGroup()" >
+					<i class="fa fa-search"></i>
+				</button>
 			</div>
+			<table id="myTable">
+				<tr class="header">
+					<th style="width: 40%;">Frist Name</th>
+					<th style="width: 40%;">Last Name</th>
+					<th style="width: 20%;"><input type="checkbox" name="vehicle3"
+						value="Boat" /></th>
+
+				</tr>
+				<tr>
+					<td>Alfreds Futterkiste</td>
+					<td>Alfreds Futterkiste</td>
+					<td><input type="checkbox" name="vehicle3" value="Boat" /></td>
+				</tr>
+			</table>
 		</div>
 
 	</div>
@@ -45,7 +54,8 @@
 					<div class="headind_srch">
 						<div class="recent_heading">
 							<h4>Recent</h4>
-							<button id="myBtn">Open Modal</button>
+							<button id="myBtn" style="visibility: hidden;">Open
+								Modal</button>
 						</div>
 						<div class="srch_bar">
 							<div class="stylish-input-group">
@@ -81,6 +91,7 @@
 		var currentUser;
 		var friendList;
 		var currentGroup;
+		var listIdAdd = [];
 		var websocket = new WebSocket(
 				"ws://localhost:8080/WebSocketChatServer/chatRoomServer");
 		websocket.onopen = function(message) {
@@ -144,7 +155,12 @@
 				if (respone.typeRequest == 'getMessageGroupFromUser') {
 					showMessageRealTime(respone.content);
 				}
-
+				if (respone.typeRequest == 'getResultSearch') {
+					showResultSearch(respone.content);
+				}
+				if(respone.typeRequest == 'addSuccess'){
+					alert("Add friend success");
+				}
 			}
 		}
 		function processClose(message) {
@@ -158,79 +174,9 @@
 			showFriendMessage(message);
 		}
 
-		function getMessage() {
-			if (typeof websocket != 'undefined'
-					&& websocket.readyState == WebSocket.OPEN) {
-				var message = {
-					'toUser' : currentUser,
-					'token' : cookie,
-					'function' : 'GET_MESSAGE'
-				}
-				console.log(message);
-				websocket.send(JSON.stringify(message));
-
-			}
-		}
-		function getMessageGroup() {
-			if (typeof websocket != 'undefined'
-					&& websocket.readyState == WebSocket.OPEN) {
-				var message = {
-					'toGroupUser' : currentGroup,
-					'token' : cookie,
-					'function' : 'GET_MESSAGE_GROUP'
-				}
-				console.log(message);
-				websocket.send(JSON.stringify(message));
-			}
-		}
-		function sendMessage() {
-			if (typeof websocket != 'undefined'
-					&& websocket.readyState == WebSocket.OPEN) {
-				if (currentUser != null) {
-					var content = $('#textMessage').val();
-					$('#textMessage').val("");
-					var message = {
-						'toUser' : currentUser,
-						'token' : cookie,
-						'content' : content,
-						'function' : 'SEND_MESSAGE_TO_USER'
-					}
-					console.log(message);
-					websocket.send(JSON.stringify(message));
-					showMyMessage(content);
-				} else {
-					var content = $('#textMessage').val();
-					$('#textMessage').val("");
-					var message = {
-						'toGroupUser' : currentGroup,
-						'token' : cookie,
-						'content' : content,
-						'function' : 'SEND_MESSAGE_TO_GROUP'
-					}
-					console.log(message);
-					websocket.send(JSON.stringify(message));
-					showMyMessage(content);
-				}
-			}
-		}
-
-		function createConnect() {
-			console.log(websocket);
-			if (typeof websocket != 'undefined') {
-				console.log(websocket);
-				var message = $('#textMessage').val();
-				var context = $('#textMessage').val();
-				var message = {
-					'token' : cookie,
-					'function' : 'START_CONNECTION'
-				}
-				console.log(message);
-				websocket.send(JSON.stringify(message));
-			}
-		}
-
 		$(document).ready(function() {
 			createConnect();
+			
 		});
 
 		// Get the modal
@@ -259,6 +205,7 @@
 			}
 		}
 	</script>
+	<script type="text/javascript" src="controller.js"></script>
 	<script type="text/javascript" src="draw.js"></script>
 	<script type="text/javascript" src="slim.js"></script>
 	<script type="text/javascript" src="popper.js"></script>
