@@ -60,3 +60,10 @@ INSERT INTO `db_chat`.`group_chat_detail` (`id`, `group_id`, `user_id`) VALUES (
 
 INSERT INTO `db_chat`.`message_group` (`id`, `from_user_id`, `group_id`, `content`) VALUES ('1', '1', '1', 'Test message');
 
+
+INSERT INTO `db_chat`.`relationship` (`id`, `frist_user_id`, `second_user_id`, `status`) VALUES ('1', '1', '2', '1');
+INSERT INTO `db_chat`.`relationship` (`id`, `frist_user_id`, `second_user_id`, `status`) VALUES ('2', '1', '3', '1');
+INSERT INTO `db_chat`.`relationship` (`id`, `frist_user_id`, `second_user_id`, `status`) VALUES ('3', '1', '4', '1');
+INSERT INTO `db_chat`.`relationship` (`id`, `frist_user_id`, `second_user_id`, `status`) VALUES ('4', '2', '4', '1');
+INSERT INTO `db_chat`.`relationship` (`id`, `frist_user_id`, `second_user_id`, `status`) VALUES ('5', '2', '3', '1');
+
