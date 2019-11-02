@@ -37,6 +37,7 @@ public class ChatRoomServerEndpoint {
 
 	@OnOpen
 	public void handleOpen(Session session) {
+		System.out.println("CONNECT");
 	}
 
 	@OnMessage
@@ -75,7 +76,10 @@ public class ChatRoomServerEndpoint {
 				sendMessageToOnlineUser(messageGroup);
 			}
 			if ("CREATE_GROUP".equals(messageFromUser.function)) {
-				System.out.println("NMQ");
+				String groupName = messageFromUser.groupName;
+				List<Integer> listID = messageFromUser.listID;
+				createGroupChat(groupName, listID);
+				
 			}
 		}
 	}
@@ -197,6 +201,13 @@ public class ChatRoomServerEndpoint {
 			messageDAOImpl = new MessageDAOImpl();
 		}
 		messageDAOImpl.insertMessage(message);
+	}
+	
+	private void createGroupChat(String groupName, List<Integer> listID) {
+		if (groupDAOImpl == null) {
+			groupDAOImpl = new GroupDAOImpl();
+		}
+		groupDAOImpl.createGroupChat(groupName, listID);
 	}
 
 	@OnClose

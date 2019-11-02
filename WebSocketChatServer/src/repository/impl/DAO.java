@@ -12,7 +12,7 @@ public class DAO {
 			try {
 				Class.forName("com.mysql.jdbc.Driver");
 				try {
-					connection = DriverManager.getConnection("jdbc:mysql://localhost/db_chat?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC", "root", "root");
+					connection = DriverManager.getConnection("jdbc:mysql://localhost/db_chat?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC", "root", "");
 				} catch (SQLException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

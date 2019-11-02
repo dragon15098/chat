@@ -2,6 +2,7 @@
 <html>
 
 <head>
+<meta charset="UTF-8">
 <script type="text/javascript" src="jquery.js"></script>
 <link rel="stylesheet" href="bootstrap.css">
 <link rel="stylesheet" href="styles.css">
@@ -9,43 +10,18 @@
 </head>
 
 <body>
-	<!-- The Modal -->
-	<div id="myModal" class="modal">
-
-		<!-- Modal content -->
-		<div class="modal-content">
-			<span class="close">&times;</span>
-			<p>Some text in the Modal..</p>
-			<div class="inbox_people">
-				<div class="headind_srch">
-					<div class="recent_heading">
-						<h4>Recent</h4>
-					</div>
-					<div class="srch_bar">
-						<div class="stylish-input-group">
-							<input type="text" class="search-bar" placeholder="Search">
-							<span class="input-group-addon">
-								<button type="button">
-									<i class="fa fa-search" aria-hidden="true"></i>
-								</button>
-							</span>
-						</div>
-					</div>
-				</div>
-				<!-- <div id="inbox_chat" class="inbox_chat"></div> -->
-			</div>
-		</div>
-
-	</div>
 	<div class="container">
-		<h3 class=" text-center">Messaging</h3>
-		<div class="messaging">
-			<div class="inbox_msg">
+		<!-- The Modal -->
+		<div id="myModal" class="modal">
+
+			<!-- Modal content -->
+			<div class="modal-content">
+				<span class="close">&times;</span>
+				<p>Some text in the Modal..</p>
 				<div class="inbox_people">
 					<div class="headind_srch">
 						<div class="recent_heading">
 							<h4>Recent</h4>
-							<button id="myBtn">Open Modal</button>
 						</div>
 						<div class="srch_bar">
 							<div class="stylish-input-group">
@@ -58,211 +34,350 @@
 							</div>
 						</div>
 					</div>
-					<div id="inbox_chat" class="inbox_chat"></div>
+					<!-- <div id="inbox_chat" class="inbox_chat"></div> -->
 				</div>
-				<div class="mesgs">
-					<div id="msg_history" class="msg_history"></div>
-					<div class="type_msg">
-						<div class="input_msg_write">
-							<input type="text" class="write_msg" placeholder="Type a message"
-								id="textMessage" />
-							<button class="msg_send_btn" type="button"
-								onclick="sendMessage()" value="Send Message">
-								<i class="fas fa-paper-plane"></i>
-							</button>
+			</div>
+
+		</div>
+
+		<!-- START: Modal Create group chat-->
+		<div class="modal fade" role="dialog" data-backdrop="false"
+			id="modalCreateGroupChat">
+			<div class="modal-dialog">
+				<!-- Modal content -->
+				<div class="modal-content">
+					<div class="modal-header">
+						<h4 class="modal-title">
+							Tạo Group Chat: <input type="text" id="textGroupChatName" />
+						</h4>
+					</div>
+					<div class="modal_body">
+						<table>
+							<tr>
+								<th style="width: 10%">ID</th>
+								<th style="width: 80%">Tên</th>
+								<th style="width: 10%">Chọn</th>
+							</tr>
+							<tr>
+								<td>1</td>
+								<td>Bạn loz 1</td>
+								<td>
+									<div class="custom-control custom-switch">
+										<input type="checkbox" class="custom-control-input"
+											id="customSwitch1" onchange="updateListFriendID(1, event)">
+										<label class="custom-control-label" for="customSwitch1"></label>
+									</div>
+
+								</td>
+							</tr>
+							<tr>
+								<td>2</td>
+								<td>Bạn loz 2</td>
+								<td>
+									<div class="custom-control custom-switch">
+										<input type="checkbox" class="custom-control-input"
+											id="customSwitch2" onchange="updateListFriendID(2, event)">
+										<label class="custom-control-label" for="customSwitch2"></label>
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td>3</td>
+								<td>Bạn loz 3</td>
+								<td>
+									<div class="custom-control custom-switch">
+										<input type="checkbox" class="custom-control-input"
+											id="customSwitch3" onchange="updateListFriendID(3, event)">
+										<label class="custom-control-label" for="customSwitch3"></label>
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td>4</td>
+								<td>Bạn loz 4</td>
+								<td>
+									<div class="custom-control custom-switch">
+										<input type="checkbox" class="custom-control-input"
+											id="customSwitch4" onchange="updateListFriendID(4, event)">
+										<label class="custom-control-label" for="customSwitch4"></label>
+									</div>
+								</td>
+							</tr>
+						</table>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-primary" data-dismiss="modal"
+							onclick="createGroupChat()">Tạo</button>
+						<button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- END: Modal Create group chat-->
+
+		<div class="container">
+			<h3 class=" text-center">Messaging</h3>
+			<div class="messaging">
+				<div class="inbox_msg">
+					<div class="inbox_people">
+						<div class="headind_srch">
+							<div class="recent_heading">
+								<h4>Recent</h4>
+								<button id="myBtn">Open Modal</button>
+								<button type="button" class="btn btn-info" data-toggle="modal"
+									data-target="#modalCreateGroupChat">Tạo Nhóm</button>
+							</div>
+							<div class="srch_bar">
+								<div class="stylish-input-group">
+									<input type="text" class="search-bar" placeholder="Search">
+									<span class="input-group-addon">
+										<button type="button">
+											<i class="fa fa-search" aria-hidden="true"></i>
+										</button>
+									</span>
+								</div>
+							</div>
+						</div>
+						<div id="inbox_chat" class="inbox_chat"></div>
+					</div>
+					<div class="mesgs">
+						<div id="msg_history" class="msg_history"></div>
+						<div class="type_msg">
+							<div class="input_msg_write">
+								<input type="text" class="write_msg"
+									placeholder="Type a message" id="textMessage" />
+								<button class="msg_send_btn" type="button"
+									onclick="sendMessage()" value="Send Message">
+									<i class="fas fa-paper-plane"></i>
+								</button>
+							</div>
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
+
+
+
 	</div>
-	<script type="text/javascript">
-		var cookie = window.location.hash.substring(1);
-		var currentUser;
-		var friendList;
-		var currentGroup;
-		var websocket = new WebSocket(
-				"ws://localhost:8080/WebSocketChatServer/chatRoomServer");
-		websocket.onopen = function(message) {
-			processOpen(message);
-		};
-		websocket.onmessage = function(message) {
-			processMessage(message);
-		};
-		websocket.onclose = function(message) {
-			processClose(message);
-		};
-		websocket.onerror = function(message) {
-			processError(message);
-		};
-		function processOpen(message) {
-			//textAreaMessage.value += "Server connect... \n";
-		}
-		function processMessage(message) {
-			var respone = JSON.parse(message.data);
-			console.log(respone);
-			if (respone.code == 200) {
-				if (respone.typeRequest == 'getMessage') {
-					for (i in respone.content) {
-						if (respone.content[i].fromUserId == cookie) {
-							showMyMessage(respone.content[i].content);
-						} else {
-							showFriendMessage(respone.content[i].content);
-						}
-					}
-				}
-				if (respone.typeRequest == 'getMessageGroup') {
-					for (i in respone.content) {
-						if (respone.content[i].fromUserId == cookie) {
-							showMyMessage(respone.content[i].content);
-						} else {
-							showFriendMessage(respone.content[i].content);
-						}
-					}
-				}
-				if (respone.typeRequest == 'getRelationship') {
 
-					friendList = respone.content;
-					currentUser = respone.content[0].id;
-					console.log(friendList);
-					console.log('currentUser:' + currentUser);
-					for (i in friendList) {
-						showFriendList(respone.content[i]);
-					}
-					getMessage();
-				}
-				if (respone.typeRequest == 'getGroupList') {
-					groupList = respone.content;
-					for (i in groupList) {
-						console.log(groupList[i])
-						showGroup(groupList[i]);
-					}
-				}
-				if (respone.typeRequest == 'getMessageFromUser') {
-					showMessageRealTime(respone.content);
-				}
-				if (respone.typeRequest == 'getMessageGroupFromUser') {
-					showMessageRealTime(respone.content);
-				}
+</body>
 
+
+<script type="text/javascript">
+	var cookie = window.location.hash.substring(1);
+	var currentUser;
+	var friendList;
+	var currentGroup;
+	var websocket = new WebSocket(
+			"ws://localhost:8080/WebSocketChatServer/chatRoomServer");
+	websocket.onopen = function(message) {
+		processOpen(message);
+	};
+	websocket.onmessage = function(message) {
+		processMessage(message);
+	};
+	websocket.onclose = function(message) {
+		processClose(message);
+	};
+	websocket.onerror = function(message) {
+		processError(message);
+	};
+	function processOpen(message) {
+		//textAreaMessage.value += "Server connect... \n";
+	}
+	function processMessage(message) {
+		var respone = JSON.parse(message.data);
+		console.log(respone);
+		if (respone.code == 200) {
+			if (respone.typeRequest == 'getMessage') {
+				for (i in respone.content) {
+					if (respone.content[i].fromUserId == cookie) {
+						showMyMessage(respone.content[i].content);
+					} else {
+						showFriendMessage(respone.content[i].content);
+					}
+				}
 			}
-		}
-		function processClose(message) {
-			//textAreaMessage.value += "Server Disconnect... \n";
-		}
-		function processError(message) {
-			//textAreaMessage.value += "Error... " + message + " \n";
-		}
+			if (respone.typeRequest == 'getMessageGroup') {
+				for (i in respone.content) {
+					if (respone.content[i].fromUserId == cookie) {
+						showMyMessage(respone.content[i].content);
+					} else {
+						showFriendMessage(respone.content[i].content);
+					}
+				}
+			}
+			if (respone.typeRequest == 'getRelationship') {
 
-		function showMessageRealTime(message) {
-			showFriendMessage(message);
-		}
+				friendList = respone.content;
+				currentUser = respone.content[0].id;
+				console.log(friendList);
+				console.log('currentUser:' + currentUser);
+				for (i in friendList) {
+					showFriendList(respone.content[i]);
+				}
+				getMessage();
+			}
+			if (respone.typeRequest == 'getGroupList') {
+				groupList = respone.content;
+				for (i in groupList) {
+					console.log(groupList[i])
+					showGroup(groupList[i]);
+				}
+			}
+			if (respone.typeRequest == 'getMessageFromUser') {
+				showMessageRealTime(respone.content);
+			}
+			if (respone.typeRequest == 'getMessageGroupFromUser') {
+				showMessageRealTime(respone.content);
+			}
 
-		function getMessage() {
-			if (typeof websocket != 'undefined'
-					&& websocket.readyState == WebSocket.OPEN) {
+		}
+	}
+	function processClose(message) {
+		//textAreaMessage.value += "Server Disconnect... \n";
+	}
+	function processError(message) {
+		//textAreaMessage.value += "Error... " + message + " \n";
+	}
+
+	function showMessageRealTime(message) {
+		showFriendMessage(message);
+	}
+
+	function getMessage() {
+		if (typeof websocket != 'undefined'
+				&& websocket.readyState == WebSocket.OPEN) {
+			var message = {
+				'toUser' : currentUser,
+				'token' : cookie,
+				'function' : 'GET_MESSAGE'
+			}
+			console.log(message);
+			websocket.send(JSON.stringify(message));
+
+		}
+	}
+	function getMessageGroup() {
+		if (typeof websocket != 'undefined'
+				&& websocket.readyState == WebSocket.OPEN) {
+			var message = {
+				'toGroupUser' : currentGroup,
+				'token' : cookie,
+				'function' : 'GET_MESSAGE_GROUP'
+			}
+			console.log(message);
+			websocket.send(JSON.stringify(message));
+		}
+	}
+	function sendMessage() {
+		if (typeof websocket != 'undefined'
+				&& websocket.readyState == WebSocket.OPEN) {
+			if (currentUser != null) {
+				var content = $('#textMessage').val();
+				$('#textMessage').val("");
 				var message = {
 					'toUser' : currentUser,
 					'token' : cookie,
-					'function' : 'GET_MESSAGE'
+					'content' : content,
+					'function' : 'SEND_MESSAGE_TO_USER'
 				}
 				console.log(message);
 				websocket.send(JSON.stringify(message));
-
-			}
-		}
-		function getMessageGroup() {
-			if (typeof websocket != 'undefined'
-					&& websocket.readyState == WebSocket.OPEN) {
+				showMyMessage(content);
+			} else {
+				var content = $('#textMessage').val();
+				$('#textMessage').val("");
 				var message = {
 					'toGroupUser' : currentGroup,
 					'token' : cookie,
-					'function' : 'GET_MESSAGE_GROUP'
+					'content' : content,
+					'function' : 'SEND_MESSAGE_TO_GROUP'
 				}
 				console.log(message);
 				websocket.send(JSON.stringify(message));
+				showMyMessage(content);
 			}
 		}
-		function sendMessage() {
-			if (typeof websocket != 'undefined'
-					&& websocket.readyState == WebSocket.OPEN) {
-				if (currentUser != null) {
-					var content = $('#textMessage').val();
-					$('#textMessage').val("");
-					var message = {
-						'toUser' : currentUser,
-						'token' : cookie,
-						'content' : content,
-						'function' : 'SEND_MESSAGE_TO_USER'
-					}
-					console.log(message);
-					websocket.send(JSON.stringify(message));
-					showMyMessage(content);
-				} else {
-					var content = $('#textMessage').val();
-					$('#textMessage').val("");
-					var message = {
-						'toGroupUser' : currentGroup,
-						'token' : cookie,
-						'content' : content,
-						'function' : 'SEND_MESSAGE_TO_GROUP'
-					}
-					console.log(message);
-					websocket.send(JSON.stringify(message));
-					showMyMessage(content);
-				}
-			}
-		}
+	}
 
-		function createConnect() {
+	function createConnect() {
+		console.log(websocket);
+		if (typeof websocket != 'undefined'
+				&& websocket.readyState == WebSocket.OPEN) {
 			console.log(websocket);
-			if (typeof websocket != 'undefined') {
-				console.log(websocket);
-				var message = $('#textMessage').val();
-				var context = $('#textMessage').val();
-				var message = {
-					'token' : cookie,
-					'function' : 'START_CONNECTION'
-				}
-				console.log(message);
-				websocket.send(JSON.stringify(message));
+			var message = $('#textMessage').val();
+			var context = $('#textMessage').val();
+			var message = {
+				'token' : cookie,
+				'function' : 'START_CONNECTION'
 			}
+			console.log(message);
+			websocket.send(JSON.stringify(message));
 		}
+	}
 
-		$(document).ready(function() {
-			createConnect();
-		});
+	$(document).ready(function() {
+		createConnect();
+	});
 
-		// Get the modal
-		var modal = document.getElementById("myModal");
+	// Get the modal
+	var modal = document.getElementById("myModal");
 
-		// Get the button that opens the modal
-		var btn = document.getElementById("myBtn");
+	// Get the button that opens the modal
+	var btn = document.getElementById("myBtn");
 
-		// Get the <span> element that closes the modal
-		var span = document.getElementsByClassName("close")[0];
+	// Get the <span> element that closes the modal
+	var span = document.getElementsByClassName("close")[0];
 
-		// When the user clicks the button, open the modal 
-		btn.onclick = function() {
-			modal.style.display = "block";
-		}
+	// When the user clicks the button, open the modal 
+	btn.onclick = function() {
+		modal.style.display = "block";
+	}
 
-		// When the user clicks on <span> (x), close the modal
-		span.onclick = function() {
+	// When the user clicks on <span> (x), close the modal
+	span.onclick = function() {
+		modal.style.display = "none";
+	}
+
+	// When the user clicks anywhere outside of the modal, close it
+	window.onclick = function(event) {
+		if (event.target == modal) {
 			modal.style.display = "none";
 		}
+	}
+</script>
 
-		// When the user clicks anywhere outside of the modal, close it
-		window.onclick = function(event) {
-			if (event.target == modal) {
-				modal.style.display = "none";
-			}
+<!-- BEGIN JS Minh -->
+<script>
+	var listFriendID = [];
+	function updateListFriendID(ID, event) {
+		if (event.target.checked) {
+			listFriendID.push(ID);
+		} else {
+			var indexOfID = listFriendID.indexOf(ID);
+			listFriendID.splice(indexOfID, 1);
 		}
-	</script>
-	<script type="text/javascript" src="draw.js"></script>
-	<script type="text/javascript" src="slim.js"></script>
-	<script type="text/javascript" src="popper.js"></script>
-	<script type="text/javascript" src="bootstrap.js"></script>
-</body>
+	}
+
+	function createGroupChat() {
+		//listFriendID.push(5); //Giả sử ID người dùng hiện tại là 5
+		var groupName = $('#textGroupChatName').val();
+		var dataRequest = {
+			'groupName' : groupName,
+			'listID' : listFriendID,
+			'function' : 'CREATE_GROUP'
+		};
+		console.log(dataRequest);
+		websocket.send(JSON.stringify(dataRequest));
+	}
+</script>
+<!-- END JS Minh -->
+
+<script type="text/javascript" src="draw.js"></script>
+<script type="text/javascript" src="slim.js"></script>
+<script type="text/javascript" src="popper.js"></script>
+<script type="text/javascript" src="bootstrap.js"></script>
 
 </html>

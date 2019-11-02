@@ -11,4 +11,5 @@ public interface GroupDAO {
 	List<Integer> getUserIdIn(Integer groupId);
 	void addUserToGroup(GroupChatDetail groupChatDetail);
 	void removeUserFromGroup(Integer groupId, Integer userId);
+	void createGroupChat(String groupName, List<Integer> listID);
 }
