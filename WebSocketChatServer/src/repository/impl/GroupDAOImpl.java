@@ -96,5 +96,46 @@ public class GroupDAOImpl extends DAO implements GroupDAO {
 			e.printStackTrace();
 		}	
 	}
+	
+	@Override
+	public void createGroupChat(String groupName, List<Integer> listID) {
+		String insertSql = "INSERT INTO group_chat(content) VALUES ('?')";
+		try {
+			PreparedStatement preparedStatement = getConnection().prepareStatement(insertSql);
+			preparedStatement.setString(1, groupName);
+			int affectedRows = preparedStatement.executeUpdate();
+			if (affectedRows == 0) {
+				throw new SQLException("Creating Group Chat failed, no rows affected.");
+			}
+		} catch (SQLException e) {
+			// TODO: handle exception
+		}
+		
+		//Get ID Group
+		int groupID = -1;
+		
+		insertSql = "SELECT id FROM group_chat WHERE content = '?'";
+		try {
+			PreparedStatement preparedStatement = getConnection().prepareStatement(insertSql);
+			preparedStatement.setString(1, groupName);
+			int affectedRows = preparedStatement.executeUpdate();
+			if (affectedRows == 0) {
+				throw new SQLException("Get Group Chat ID failed, no rows affected.");
+			}
+			ResultSet resultSet = preparedStatement.executeQuery();
+			groupID = resultSet.getInt(0);
+		} catch (SQLException e) {
+			// TODO: handle exception
+		}
+		
+		//Insert Mem to GroupChat
+		GroupChatDetail groupChat = new GroupChatDetail();
+		for(Integer userID: listID) {
+			groupChat.groupId = groupID;
+			groupChat.userId = userID;
+			addUserToGroup(groupChat);
+		}
+	}
+	
 
 }
