@@ -74,6 +74,9 @@ public class ChatRoomServerEndpoint {
 				saveMessageToDB(messageGroup);
 				sendMessageToOnlineUser(messageGroup);
 			}
+			if ("CREATE_GROUP".equals(messageFromUser.function)) {
+				System.out.println("NMQ");
+			}
 		}
 	}
 
@@ -112,7 +115,7 @@ public class ChatRoomServerEndpoint {
 	private void sendMessageToOnlineUser(MessageGroup messageGroup) {
 		messageGroup.userIds.forEach(id -> {
 			String idStr = id.toString();
-			if(id!=messageGroup.fromUserId) {
+			if (id != messageGroup.fromUserId) {
 				Session sessionUserReceiver = userMapping.get(idStr);
 				if (sessionUserReceiver != null) {
 					if (sessionUserReceiver.isOpen()) {
@@ -128,9 +131,9 @@ public class ChatRoomServerEndpoint {
 	}
 
 	private MessageGroup createMessageGroup(Request messageFromUser) {
-		if(groupDAOImpl == null) {
+		if (groupDAOImpl == null) {
 			groupDAOImpl = new GroupDAOImpl();
-		} 
+		}
 		MessageGroup messageGroup = new MessageGroup();
 		messageGroup.fromUserId = Integer.parseInt(messageFromUser.token);
 		messageGroup.userIds = groupDAOImpl.getUserIdIn(messageFromUser.toGroupUser);
