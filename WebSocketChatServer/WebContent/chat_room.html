@@ -24,10 +24,10 @@
 			<div class="example">
 				<input id="textSearch" type="text" placeholder="Search.."
 					name="search">
-				<button onclick="searchFriend()">
+				<button onclick="searchFriend()" >
 					<i class="fa fa-search"></i>
 				</button>
-				<button onclick="addFriendToGroup()">
+				<button onclick="addFriendToGroup()" >
 					<i class="fa fa-search"></i>
 				</button>
 			</div>
@@ -62,7 +62,6 @@
 			</div>
 		</div>
 	</div>
-	<<<<<<< HEAD
 
 
 	<!-- The Modal -->
@@ -73,29 +72,11 @@
 			<span class="close">&times;</span>
 			<p>Remove friend from group</p>
 
-			<div class="example">
-				<input id="textSearch" type="text" placeholder="Search.."
-					name="search">
-				<button onclick="deleteFriend()">
-					<i class="fa fa-search"></i>
-				</button>
-				<button onclick="deleteFriend()">
-					<i class="fa fa-trash "></i>
-				</button>
-			</div>
-			<table id="myTableDelete">
-				<tr class="header">
-					<th style="width: 40%;">Frist Name</th>
-					<th style="width: 40%;">Last Name</th>
-					<th style="width: 20%;"><input type="checkbox" name="vehicle3" /></th>
-				</tr>
-			</table>
 		</div>
+
 	</div>
-	=======
 	<!-- END: Modal Create group chat-->
 
-	>>>>>>> d63f52c50c7ca93f3af44cc63b4eb60240e70089
 	<div class="container">
 		<h3 class=" text-center">Messaging</h3>
 		<div class="messaging">
@@ -104,16 +85,13 @@
 					<div class="headind_srch">
 						<div class="recent_heading">
 							<h4>Recent</h4>
-							<<<<<<< HEAD
-							<button id="myBtn" style="visibility: hidden;">Add to
-								group</button>
-							<button id="myBtnDelete" style="visibility: hidden;">Remove
-								user</button>
-							=======
+
 							<button id="myBtn">Open Modal</button>
 							<button type="button" class="btn btn-info" data-toggle="modal"
 								data-target="#modalCreateGroupChat">Tạo Nhóm</button>
-							>>>>>>> d63f52c50c7ca93f3af44cc63b4eb60240e70089
+							<button id="myBtn" style="visibility: hidden;">Open
+								Modal</button>
+
 						</div>
 						<div class="srch_bar">
 							<div class="stylish-input-group">
@@ -223,16 +201,10 @@
 					showMessageRealTime(respone.content);
 				}
 				if (respone.typeRequest == 'getResultSearch') {
-					var myTable = document.getElementById('myTable');
-					showResultSearch(myTable, respone.content);
+					showResultSearch(respone.content);
 				}
-				if (respone.typeRequest == 'addSuccess') {
+				if(respone.typeRequest == 'addSuccess'){
 					alert("Add friend success");
-				}
-				if (respone.typeRequest == 'searchFriendsInGroup') {
-					var myTableDelete = document
-							.getElementById('myTableDelete');
-					showResultSearch(myTableDelete, respone.content);
 				}
 			}
 		}
@@ -332,36 +304,6 @@
 			} else {
 				var indexOfID = listFriendID.indexOf(ID);
 				listFriendID.splice(indexOfID, 1);
-			}
-		}
-
-		// Delete 
-
-		// Get the modal
-		var modalDelete = document.getElementById("myModalDelete");
-
-		// Get the button that opens the modal
-		var btnDelete = document.getElementById("myBtnDelete");
-
-		// Get the <span> element that closes the modal
-		var spanDelete = document.getElementsByClassName("close")[1];
-
-		// When the user clicks the button, open the modal 
-		btnDelete.onclick = function() {
-
-			modalDelete.style.display = "block";
-			searchFriendInGroup();
-		}
-
-		// When the user clicks on <span> (x), close the modal
-		spanDelete.onclick = function() {
-			modalDelete.style.display = "none";
-		}
-
-		// When the user clicks anywhere outside of the modal, close it
-		window.onclick = function(event) {
-			if (event.target == modalDelete) {
-				modalDelete.style.display = "none";
 			}
 		}
 	</script>

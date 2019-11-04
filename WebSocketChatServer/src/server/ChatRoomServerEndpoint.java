@@ -117,14 +117,13 @@ public class ChatRoomServerEndpoint {
 				for (Integer id : messageFromUser.friendIds) {
 
 				}
-				if ("CREATE_GROUP".equals(messageFromUser.function)) {
-					String groupName = messageFromUser.groupName;
-					List<Integer> listID = messageFromUser.listID;
-					createGroupChat(groupName, listID);
-				}
+			}
+			if ("CREATE_GROUP".equals(messageFromUser.function)) {
+				String groupName = messageFromUser.groupName;
+				List<Integer> listID = messageFromUser.listID;
+				createGroupChat(groupName, listID);
 			}
 		}
-
 	}
 
 	private void sendResultSearchFriendsInGroup(Session userSession, List<User> users) {

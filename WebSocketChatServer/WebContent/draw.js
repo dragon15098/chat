@@ -13,8 +13,8 @@ function clearMessage() {
 		child = e.lastElementChild;
 	}
 }
-function addHeaderTable(table) {
-	var table = document.getElementById(table);
+function addHeaderTable() {
+	var table = document.getElementById("myTable");
 	var tr = document.createElement("tr");
 	tr.classList.add('header');
 
@@ -53,22 +53,20 @@ function addHeaderTable(table) {
 
 	table.appendChild(tr);
 }
-function clearTableSearch(table) {
+function clearTableSearch() {
+	var e = document.getElementById("myTable");
 	// e.firstElementChild can be used.
-	var child = table.lastElementChild;
+	var child = e.lastElementChild;
 	while (child) {
-		table.removeChild(child);
-		child = table.lastElementChild;
+		e.removeChild(child);
+		child = e.lastElementChild;
 	}
 }
-
 function showButtonModifyGroup() {
 	document.getElementById('myBtn').style.visibility = 'visible';
-	document.getElementById('myBtnDelete').style.visibility = 'visible';
 }
 function hideButtonModifyGroup() {
 	document.getElementById('myBtn').style.visibility = 'hidden';
-	document.getElementById('myBtnDelete').style.visibility = 'hidden';
 }
 function showGroup(group) {
 	var element = document.getElementById("inbox_chat");
@@ -107,7 +105,9 @@ function showGroup(group) {
 	fourDiv.appendChild(p);
 	element.appendChild(fristDiv);
 }
-function showDataTable(table, user) {
+function showDataTable(user) {
+	var myTable = document.getElementById("myTable");
+
 	var tr = document.createElement("tr");
 	
 	var td1 = document.createElement("td");
@@ -123,14 +123,11 @@ function showDataTable(table, user) {
 	checkbox.type = 'checkbox';
 	checkbox.id = user.id;
 	checkbox.classList.add('check');
-	if(table.id == 'myTableDelete'){
-		checkbox.classList.add('delete');
-	}
 	td3.appendChild(checkbox);
 	tr.appendChild(td1);
 	tr.appendChild(td2);
 	tr.appendChild(td3);
-	table.appendChild(tr);
+	myTable.appendChild(tr);
 }
 function showFriendList(friend) {
 	console.log(friend);
