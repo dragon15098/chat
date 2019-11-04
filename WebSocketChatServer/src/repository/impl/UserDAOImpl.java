@@ -33,7 +33,7 @@ public class UserDAOImpl extends DAO implements UserDAO {
 
 	@Override
 	public void createUser(User user) {
-		String insert = "INSERT INTO app_user (username, password, fristname, lastname) VALUES (?,?,?,?) ";
+		String insert = "INSERT INTO app_user (user_name, pass_word, frist_name, last_name) VALUES (?,?,?,?) ";
 
 		try {
 			PreparedStatement preparedStatement = getConnection().prepareStatement(insert,

@@ -79,20 +79,20 @@ span.psw {
 
 	<div class="container">
 		<label for="uname"><b>Frist name</b></label> <input id="fristname"
-			type="text" placeholder="Enter Frist name" name="uname" required>
+			type="text" placeholder="Enter Frist name"  required>
 
 		<label for="psw"><b>Last name</b></label> <input id="lastname"
-			type="password" placeholder="Enter Last name" name="psw" required>
+			type="text"  placeholder="Enter Last name"  required>
 
 		<label for="psw"><b>User name</b></label> <input id="username"
-			type="password" placeholder="Enter User name" name="psw" required>
+			type="text"  placeholder="Enter User name" required>
 
 		<label for="psw"><b>Password</b></label> <input id="password"
-			type="password" placeholder="Enter Password" name="psw" required>
-		<label for="psw"><b>Confirm Password</b></label> <input id="confirmpassword"
-			type="password" placeholder="Enter Confirm Password" name="psw" required>
+			type="password" placeholder="Enter Password"  required>
+		<label for="psw"><b>Confirm Password</b></label> <input id="confirmPassword"
+			type="password" placeholder="Enter Confirm Password" required>
 
-		<button onclick="sendMessage()" type="submit">Register</button>
+		<button onclick="sendMessage()" >Register</button>
 		
 	</div>
 
@@ -100,21 +100,22 @@ span.psw {
 		<a class="psw"  href="index.html">Login</a>
 	</div>
 	<script type="text/javascript">
-		/*	var websocket = new WebSocket("ws://localhost:8080/WebSocketChatServer/login");
+			var websocket = new WebSocket("ws://localhost:8080/WebSocketChatServer/register");
 				websocket.onopen = function(message) {processOpen(message);};
 				websocket.onmessage = function(message) {processMessage(message);};
 				websocket.onclose = function(message) {processClose(message);};
 				websocket.onerror = function(message) {processError(message);};
 
 			function processOpen(message) {
+				console.log('Server connect... ');
 				//textAreaMessage.value += "Server connect... \n";
 			}
 			function processMessage(message) {
 				console.log(message);
 				var respone = JSON.parse(message.data);
 				console.log(respone);
-				if(respone.status === "SUCCESS"){
-					window.location.href = 'http://localhost:8080/WebSocketChatServer/test.html' + '#' + respone.cookie;
+				if(respone.code === 200){
+					window.location.href = 'http://localhost:8080/WebSocketChatServer/';
 				}
 				else{
 					console.log("LOGIN FALSE");
@@ -133,16 +134,21 @@ span.psw {
 				if (typeof websocket != 'undefined' && websocket.readyState == WebSocket.OPEN) {
 					var username = $('#username').val();
 					var password = $('#password').val();
+					var confirmPassword = $('#confirmPassword').val();
+					var fristname = $('#fristname').val();
+					var lastname = $('#lastname').val();
 					var user = {
 							"username" : username,
-							"password" : password
-					}
+							"password" : password,
+							"confirmPassword" : confirmPassword,
+							"fristname" : fristname,
+							"lastname" : lastname
+					};
 					console.log(user);
-					console.log(password);
 					websocket.send(JSON.stringify(user));
-					//textMessage.value = "";
+			
 				}
-			} */
+			} 
 	</script>
 </body>
 </html>

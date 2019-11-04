@@ -15,6 +15,7 @@ public class User {
     public Integer id;
     public String username;
     public String password;
+    public String confirmPassword;
     public String fristname;
     public String lastname;
 
