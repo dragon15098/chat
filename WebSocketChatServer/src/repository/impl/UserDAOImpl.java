@@ -14,7 +14,7 @@ public class UserDAOImpl extends DAO implements UserDAO {
 
 	@Override
 	public User findUser(String username, String password) {
-		String sqlSelect = "SELECT * FROM APP_USER WHERE user_name = ? AND pass_word = ?";
+		String sqlSelect = "SELECT * FROM app_user WHERE user_name = ? AND pass_word = ?";
 		try {
 			PreparedStatement preparedStatement = getConnection().prepareStatement(sqlSelect);
 			preparedStatement.setString(1, username);
@@ -33,7 +33,7 @@ public class UserDAOImpl extends DAO implements UserDAO {
 
 	@Override
 	public void createUser(User user) {
-		String insert = "INSERT INTO app_user (username, password, fristname, lastname) VALUES (?,?,?,?) ";
+		String insert = "INSERT INTO app_user (user_name, pass_word, frist_name, last_name) VALUES (?,?,?,?) ";
 
 		try {
 			PreparedStatement preparedStatement = getConnection().prepareStatement(insert,

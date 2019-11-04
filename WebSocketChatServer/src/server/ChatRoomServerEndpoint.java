@@ -39,6 +39,7 @@ public class ChatRoomServerEndpoint {
 	@OnOpen
 	public void handleOpen(Session session) {
 		System.out.println("Client connect");
+		System.out.println("CONNECT");
 	}
 
 	@OnMessage
@@ -77,17 +78,17 @@ public class ChatRoomServerEndpoint {
 				sendMessageToOnlineUser(messageGroup);
 			}
 			if ("SEARCH_FRIEND".equals(messageFromUser.function)) {
-				if(groupDAOImpl!=null) {
+				if (groupDAOImpl != null) {
 					groupDAOImpl = new GroupDAOImpl();
 				}
 				List<User> users = groupDAOImpl.findUserNotInGroup(1, 1, messageFromUser.textSearch);
 				sendResultSearch(userSession, users);
 			}
 			if ("ADD_FRIENDS_TO_GROUP".equals(messageFromUser.function)) {
-				if(groupDAOImpl==null) {
+				if (groupDAOImpl == null) {
 					groupDAOImpl = new GroupDAOImpl();
 				}
-				for(Integer id : messageFromUser.friendIds) {
+				for (Integer id : messageFromUser.friendIds) {
 					GroupChatDetail groupChatDetail = new GroupChatDetail();
 					groupChatDetail.groupId = messageFromUser.toGroupUser;
 					groupChatDetail.userId = id;
@@ -96,44 +97,50 @@ public class ChatRoomServerEndpoint {
 				sendMessageInsertSuccess(userSession);
 			}
 			if ("GET_FRIEND_IN_GROUP".equals(messageFromUser.function)) {
-				if(groupDAOImpl == null) {
+				if (groupDAOImpl == null) {
 					groupDAOImpl = new GroupDAOImpl();
 				}
 				List<User> friendInGroup = groupDAOImpl.findUserInGroup(messageFromUser.toGroupUser);
 				List<User> result = new ArrayList<>();
 				for (User user : friendInGroup) {
-					if(user.id != Integer.parseInt(messageFromUser.token)) {
+					if (user.id != Integer.parseInt(messageFromUser.token)) {
 						result.add(user);
 					}
-					
+
 				}
 				sendResultSearchFriendsInGroup(userSession, result);
 			}
-			if("DELETE_FRIENDS_FROM_GROUP".equals(messageFromUser.function)) {
-				if(groupDAOImpl == null) {
+			if ("DELETE_FRIENDS_FROM_GROUP".equals(messageFromUser.function)) {
+				if (groupDAOImpl == null) {
 					groupDAOImpl = new GroupDAOImpl();
 				}
-				for(Integer id : messageFromUser.friendIds) {
-					
+				for (Integer id : messageFromUser.friendIds) {
+
+				}
+				if ("CREATE_GROUP".equals(messageFromUser.function)) {
+					String groupName = messageFromUser.groupName;
+					List<Integer> listID = messageFromUser.listID;
+					createGroupChat(groupName, listID);
 				}
 			}
 		}
+
 	}
 
-	private void sendResultSearchFriendsInGroup(Session userSession, List<User> users){
+	private void sendResultSearchFriendsInGroup(Session userSession, List<User> users) {
 		MessageRespone messageRespone = new MessageRespone<>();
 		messageRespone.typeRequest = "searchFriendsInGroup";
 		messageRespone.code = 200;
-		messageRespone.content= users;
+		messageRespone.content = users;
 		ResponeSender.sentRespone(userSession, messageRespone);
 	}
-	
+
 	private void sendMessageInsertSuccess(Session userSession) {
 		MessageRespone messageRespone = new MessageRespone<>();
 		messageRespone.typeRequest = "addSuccess";
 		messageRespone.code = 200;
 		ResponeSender.sentRespone(userSession, messageRespone);
-		
+
 	}
 
 	private void sendResultSearch(Session userSession, List<User> users) {
@@ -179,7 +186,7 @@ public class ChatRoomServerEndpoint {
 	private void sendMessageToOnlineUser(MessageGroup messageGroup) {
 		messageGroup.userIds.forEach(id -> {
 			String idStr = id.toString();
-			if(id!=messageGroup.fromUserId) {
+			if (id != messageGroup.fromUserId) {
 				Session sessionUserReceiver = userMapping.get(idStr);
 				if (sessionUserReceiver != null) {
 					if (sessionUserReceiver.isOpen()) {
@@ -195,9 +202,9 @@ public class ChatRoomServerEndpoint {
 	}
 
 	private MessageGroup createMessageGroup(Request messageFromUser) {
-		if(groupDAOImpl == null) {
+		if (groupDAOImpl == null) {
 			groupDAOImpl = new GroupDAOImpl();
-		} 
+		}
 		MessageGroup messageGroup = new MessageGroup();
 		messageGroup.fromUserId = Integer.parseInt(messageFromUser.token);
 		messageGroup.userIds = groupDAOImpl.getUserIdIn(messageFromUser.toGroupUser);
@@ -261,6 +268,13 @@ public class ChatRoomServerEndpoint {
 			messageDAOImpl = new MessageDAOImpl();
 		}
 		messageDAOImpl.insertMessage(message);
+	}
+
+	private void createGroupChat(String groupName, List<Integer> listID) {
+		if (groupDAOImpl == null) {
+			groupDAOImpl = new GroupDAOImpl();
+		}
+		groupDAOImpl.createGroupChat(groupName, listID);
 	}
 
 	@OnClose

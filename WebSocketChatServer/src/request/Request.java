@@ -10,4 +10,6 @@ public class Request {
 	public String function;
 	public String textSearch;
 	public List<Integer> friendIds;
+	public List<Integer> listID;
+	public String groupName;
 }
