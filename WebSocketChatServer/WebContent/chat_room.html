@@ -2,6 +2,7 @@
 <html>
 
 <head>
+<meta charset="UTF-8">
 <script type="text/javascript" src="jquery.js"></script>
 <link rel="stylesheet" href="bootstrap.css">
 <link rel="stylesheet" href="styles.css">
@@ -11,6 +12,7 @@
 </head>
 
 <body>
+
 	<!-- The Modal -->
 	<div id="myModal" class="modal">
 
@@ -22,10 +24,10 @@
 			<div class="example">
 				<input id="textSearch" type="text" placeholder="Search.."
 					name="search">
-				<button onclick="searchFriend()" >
+				<button onclick="searchFriend()">
 					<i class="fa fa-search"></i>
 				</button>
-				<button onclick="addFriendToGroup()" >
+				<button onclick="addFriendToGroup()">
 					<i class="fa fa-search"></i>
 				</button>
 			</div>
@@ -45,43 +47,29 @@
 			</table>
 		</div>
 	</div>
-	
-	
-	<!-- The Modal -->
-	<div id="myModal" class="modal">
 
-		<!-- Modal content -->
-		<div class="modal-content">
-			<span class="close">&times;</span>
-			<p>Add friend to group</p>
 
-			<div class="example">
-				<input id="textSearch" type="text" placeholder="Search.."
-					name="search">
-				<button onclick="searchFriend()" >
-					<i class="fa fa-search"></i>
-				</button>
-				<button onclick="addFriendToGroup()" >
-					<i class="fa fa-search"></i>
-				</button>
+	<!-- START: Modal Create group chat-->
+	<div class="modal fade" role="dialog" data-backdrop="false"
+		id="modalCreateGroupChat">
+		<div class="modal-dialog">
+			<!-- Modal content -->
+			<div class="modal-content-custom">
+				<div class="modal-header">
+					<h4 class="modal-title">
+						Tạo Group Chat: <input type="text" id="textGroupChatName" />
+					</h4>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary" data-dismiss="modal"
+						onclick="createGroupChat()">Tạo</button>
+					<button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
+				</div>
 			</div>
-			<table id="myTable">
-				<tr class="header">
-					<th style="width: 40%;">Frist Name</th>
-					<th style="width: 40%;">Last Name</th>
-					<th style="width: 20%;"><input type="checkbox" name="vehicle3"
-						value="Boat" /></th>
-
-				</tr>
-				<tr>
-					<td>Alfreds Futterkiste</td>
-					<td>Alfreds Futterkiste</td>
-					<td><input type="checkbox" name="vehicle3" value="Boat" /></td>
-				</tr>
-			</table>
 		</div>
 	</div>
-	
+	<!-- END: Modal Create group chat-->
+
 	<div class="container">
 		<h3 class=" text-center">Messaging</h3>
 		<div class="messaging">
@@ -90,8 +78,9 @@
 					<div class="headind_srch">
 						<div class="recent_heading">
 							<h4>Recent</h4>
-							<button id="myBtn" style="visibility: hidden;">Open
-								Modal</button>
+							<button id="myBtn">Open Modal</button>
+							<button type="button" class="btn btn-info" data-toggle="modal"
+								data-target="#modalCreateGroupChat">Tạo Nhóm</button>
 						</div>
 						<div class="srch_bar">
 							<div class="stylish-input-group">
@@ -122,12 +111,15 @@
 			</div>
 		</div>
 	</div>
+	</div>
+
+
+
 	<script type="text/javascript">
 		var cookie = window.location.hash.substring(1);
 		var currentUser;
 		var friendList;
 		var currentGroup;
-		var listIdAdd = [];
 		var websocket = new WebSocket(
 				"ws://localhost:8080/WebSocketChatServer/chatRoomServer");
 		websocket.onopen = function(message) {
@@ -184,6 +176,12 @@
 						console.log(groupList[i])
 						showGroup(groupList[i]);
 					}
+					if (respone.typeRequest == 'getResultSearch') {
+						showResultSearch(respone.content);
+					}
+					if (respone.typeRequest == 'addSuccess') {
+						alert("Add friend success");
+					}
 				}
 				if (respone.typeRequest == 'getMessageFromUser') {
 					showMessageRealTime(respone.content);
@@ -191,12 +189,7 @@
 				if (respone.typeRequest == 'getMessageGroupFromUser') {
 					showMessageRealTime(respone.content);
 				}
-				if (respone.typeRequest == 'getResultSearch') {
-					showResultSearch(respone.content);
-				}
-				if(respone.typeRequest == 'addSuccess'){
-					alert("Add friend success");
-				}
+
 			}
 		}
 		function processClose(message) {
@@ -209,43 +202,96 @@
 		function showMessageRealTime(message) {
 			showFriendMessage(message);
 		}
-
 		$(document).ready(function() {
 			createConnect();
-			
 		});
+		function getMessage() {
+			if (typeof websocket != 'undefined'
+					&& websocket.readyState == WebSocket.OPEN) {
+				var message = {
+					'toUser' : currentUser,
+					'token' : cookie,
+					'function' : 'GET_MESSAGE'
+				}
+				console.log(message);
+				websocket.send(JSON.stringify(message));
 
-		// Get the modal
-		var modal = document.getElementById("myModal");
-
-		// Get the button that opens the modal
-		var btn = document.getElementById("myBtn");
-
-		// Get the <span> element that closes the modal
-		var span = document.getElementsByClassName("close")[0];
-
-		// When the user clicks the button, open the modal 
-		btn.onclick = function() {
-			modal.style.display = "block";
+			}
+		}
+		function getMessageGroup() {
+			if (typeof websocket != 'undefined'
+					&& websocket.readyState == WebSocket.OPEN) {
+				var message = {
+					'toGroupUser' : currentGroup,
+					'token' : cookie,
+					'function' : 'GET_MESSAGE_GROUP'
+				}
+				console.log(message);
+				websocket.send(JSON.stringify(message));
+			}
+		}
+		function sendMessage() {
+			if (typeof websocket != 'undefined'
+					&& websocket.readyState == WebSocket.OPEN) {
+				if (currentUser != null) {
+					var content = $('#textMessage').val();
+					$('#textMessage').val("");
+					var message = {
+						'toUser' : currentUser,
+						'token' : cookie,
+						'content' : content,
+						'function' : 'SEND_MESSAGE_TO_USER'
+					}
+					console.log(message);
+					websocket.send(JSON.stringify(message));
+					showMyMessage(content);
+				} else {
+					var content = $('#textMessage').val();
+					$('#textMessage').val("");
+					var message = {
+						'toGroupUser' : currentGroup,
+						'token' : cookie,
+						'content' : content,
+						'function' : 'SEND_MESSAGE_TO_GROUP'
+					}
+					console.log(message);
+					websocket.send(JSON.stringify(message));
+					showMyMessage(content);
+				}
+			}
 		}
 
-		// When the user clicks on <span> (x), close the modal
-		span.onclick = function() {
-			modal.style.display = "none";
+		function createConnect() {
+			console.log(websocket);
+			if (typeof websocket != 'undefined'
+					&& websocket.readyState == WebSocket.OPEN) {
+				console.log(websocket);
+				var message = $('#textMessage').val();
+				var context = $('#textMessage').val();
+				var message = {
+					'token' : cookie,
+					'function' : 'START_CONNECTION'
+				}
+				console.log(message);
+				websocket.send(JSON.stringify(message));
+			}
 		}
 
-		// When the user clicks anywhere outside of the modal, close it
-		window.onclick = function(event) {
-			if (event.target == modal) {
-				modal.style.display = "none";
+		var listFriendID = [];
+		function updateListFriendID(ID, event) {
+			if (event.target.checked) {
+				listFriendID.push(ID);
+			} else {
+				var indexOfID = listFriendID.indexOf(ID);
+				listFriendID.splice(indexOfID, 1);
 			}
 		}
 	</script>
-	<script type="text/javascript" src="controller.js"></script>
-	<script type="text/javascript" src="draw.js"></script>
 	<script type="text/javascript" src="slim.js"></script>
 	<script type="text/javascript" src="popper.js"></script>
 	<script type="text/javascript" src="bootstrap.js"></script>
+	<script type="text/javascript" src="draw.js"></script>
+
 </body>
 
 </html>

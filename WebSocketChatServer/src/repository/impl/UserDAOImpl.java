@@ -14,7 +14,7 @@ public class UserDAOImpl extends DAO implements UserDAO {
 
 	@Override
 	public User findUser(String username, String password) {
-		String sqlSelect = "SELECT * FROM APP_USER WHERE user_name = ? AND pass_word = ?";
+		String sqlSelect = "SELECT * FROM app_user WHERE user_name = ? AND pass_word = ?";
 		try {
 			PreparedStatement preparedStatement = getConnection().prepareStatement(sqlSelect);
 			preparedStatement.setString(1, username);

@@ -16,13 +16,14 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="F:/java jar/jackson-core-2.1.4.jar/jackson-core-2.1.4.jar"/>
-	<classpathentry kind="lib" path="F:/java jar/jackson-databind-2.1.4.jar/jackson-databind-2.1.4.jar"/>
 	<classpathentry kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER">
 		<attributes>
 			<attribute name="maven.pomderived" value="true"/>
 			<attribute name="org.eclipse.jst.component.dependency" value="/WEB-INF/lib"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="/root/eclipse/java lib/jackson-core-2.1.4.jar/jackson-core-2.1.4.jar"/>
+	<classpathentry kind="lib" path="/root/eclipse/java lib/jackson-databind-2.1.4.jar/jackson-databind-2.1.4.jar"/>
+	<classpathentry kind="lib" path="/root/Downloads/mysql-connector-java-8.0.18/mysql-connector-java-8.0.18.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

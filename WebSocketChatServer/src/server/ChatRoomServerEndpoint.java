@@ -38,6 +38,7 @@ public class ChatRoomServerEndpoint {
 	@OnOpen
 	public void handleOpen(Session session) {
 		System.out.println("Client connect");
+		System.out.println("CONNECT");
 	}
 
 	@OnMessage
@@ -94,6 +95,11 @@ public class ChatRoomServerEndpoint {
 				}
 				sendMessageInsertSuccess(userSession);
 			}
+			if ("CREATE_GROUP".equals(messageFromUser.function)) {
+				String groupName = messageFromUser.groupName;
+				List<Integer> listID = messageFromUser.listID;
+				createGroupChat(groupName, listID);
+			}
 		}
 	}
 
@@ -148,7 +154,7 @@ public class ChatRoomServerEndpoint {
 	private void sendMessageToOnlineUser(MessageGroup messageGroup) {
 		messageGroup.userIds.forEach(id -> {
 			String idStr = id.toString();
-			if(id!=messageGroup.fromUserId) {
+			if (id != messageGroup.fromUserId) {
 				Session sessionUserReceiver = userMapping.get(idStr);
 				if (sessionUserReceiver != null) {
 					if (sessionUserReceiver.isOpen()) {
@@ -164,9 +170,9 @@ public class ChatRoomServerEndpoint {
 	}
 
 	private MessageGroup createMessageGroup(Request messageFromUser) {
-		if(groupDAOImpl == null) {
+		if (groupDAOImpl == null) {
 			groupDAOImpl = new GroupDAOImpl();
-		} 
+		}
 		MessageGroup messageGroup = new MessageGroup();
 		messageGroup.fromUserId = Integer.parseInt(messageFromUser.token);
 		messageGroup.userIds = groupDAOImpl.getUserIdIn(messageFromUser.toGroupUser);
@@ -230,6 +236,13 @@ public class ChatRoomServerEndpoint {
 			messageDAOImpl = new MessageDAOImpl();
 		}
 		messageDAOImpl.insertMessage(message);
+	}
+	
+	private void createGroupChat(String groupName, List<Integer> listID) {
+		if (groupDAOImpl == null) {
+			groupDAOImpl = new GroupDAOImpl();
+		}
+		groupDAOImpl.createGroupChat(groupName, listID);
 	}
 
 	@OnClose
