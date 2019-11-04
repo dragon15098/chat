@@ -13,8 +13,9 @@ function clearMessage() {
 		child = e.lastElementChild;
 	}
 }
-function addHeaderTable() {
-	var table = document.getElementById("myTable");
+function addHeaderTable(table) {
+	console.log(table);
+	console.log('NMQ3');
 	var tr = document.createElement("tr");
 	tr.classList.add('header');
 
@@ -34,15 +35,15 @@ function addHeaderTable() {
 	input.type = 'checkbox';
 	input.id = 'check-all';
 	input.onclick = function() {
-			 if(input.checked) {
-		        $('.check').each(function() {
-		            this.checked = true;                        
-		        });
-		    } else {
-		        $('.check').each(function() {
-		            this.checked = false;                       
-		        });
-		    }
+		if (input.checked) {
+			$('.check').each(function() {
+				this.checked = true;
+			});
+		} else {
+			$('.check').each(function() {
+				this.checked = false;
+			});
+		}
 	};
 	input.classList.add('check');
 	th3.appendChild(input);
@@ -53,9 +54,8 @@ function addHeaderTable() {
 
 	table.appendChild(tr);
 }
-function clearTableSearch() {
-	var e = document.getElementById("myTable");
-	// e.firstElementChild can be used.
+function clearTableSearch(e) {
+	console.log('NMQ2');
 	var child = e.lastElementChild;
 	while (child) {
 		e.removeChild(child);
@@ -64,9 +64,11 @@ function clearTableSearch() {
 }
 function showButtonModifyGroup() {
 	document.getElementById('myBtn').style.visibility = 'visible';
+	document.getElementById('myBtnDelete').style.visibility = 'visible';
 }
 function hideButtonModifyGroup() {
 	document.getElementById('myBtn').style.visibility = 'hidden';
+	document.getElementById('myBtnDelete').style.visibility = 'visible';
 }
 function showGroup(group) {
 	var element = document.getElementById("inbox_chat");
@@ -105,11 +107,10 @@ function showGroup(group) {
 	fourDiv.appendChild(p);
 	element.appendChild(fristDiv);
 }
-function showDataTable(user) {
-	var myTable = document.getElementById("myTable");
+function showDataTable(myTable, user) {
 
 	var tr = document.createElement("tr");
-	
+
 	var td1 = document.createElement("td");
 	var node1 = document.createTextNode(user.fristname);
 	td1.appendChild(node1);
@@ -130,7 +131,7 @@ function showDataTable(user) {
 	myTable.appendChild(tr);
 }
 function showFriendList(friend) {
-	console.log(friend);
+
 	var element = document.getElementById("inbox_chat");
 
 	var fristDiv = document.createElement("div");
@@ -204,7 +205,7 @@ function showMyMessage(message) {
 };
 
 function showFriendMessage(message) {
-	console.log(message);
+	
 	var element = document.getElementById("msg_history");
 
 	var fristDiv = document.createElement("div");

@@ -13,9 +13,41 @@ function createConnect() {
 		websocket.send(JSON.stringify(message));
 	}
 }
-function addFriendToGroup() {
+
+function deleteFriend() {
 	$('.check').each(function() {
 		if (this.id != 'check-all') {
+			listIdAdd.push(this.id);
+		}
+	});
+	var message = {
+		'token' : cookie,
+		'function' : 'DELETE_FRIENDS_FROM_GROUP',
+		'friendIds' : listIdAdd,
+		'toGroupUser' : currentGroup
+	}
+	console.log(message);
+	websocket.send(JSON.stringify(message));
+}
+function searchFriendInGroup() {
+	var myTable = document.getElementById('myTableDelete');
+	console.log('NMQ1');
+	clearTableSearch(myTable);
+	addHeaderTable(myTable);
+	if (typeof websocket != 'undefined'
+			&& websocket.readyState == WebSocket.OPEN) {
+		var message = {
+			'toGroupUser' : currentGroup,
+			'token' : cookie,
+			'function' : 'GET_FRIEND_IN_GROUP'
+		}
+		websocket.send(JSON.stringify(message));
+	}
+}
+function addFriendToGroup() {
+	$('.check').each(function() {
+		var a = document.getElementById(this.id);
+		if (this.id != 'check-all' && a.checked) {
 			listIdAdd.push(this.id);
 		}
 	});
@@ -29,8 +61,9 @@ function addFriendToGroup() {
 	websocket.send(JSON.stringify(message));
 }
 function searchFriend() {
-	clearTableSearch();
-	addHeaderTable();
+	var myTable = document.getElementById('myTable');
+	clearTableSearch(myTable);
+	addHeaderTable(myTable);
 	var text = $('#textSearch').val();
 	if (typeof websocket != 'undefined'
 			&& websocket.readyState == WebSocket.OPEN) {
@@ -48,10 +81,10 @@ function searchFriend() {
 	}
 }
 
-function showResultSearch(data) {
+function showResultSearch(table, data) {
 	for (i in data) {
 		console.log(data);
-		showDataTable(data[i]);
+		showDataTable(table, data[i]);
 	}
 }
 function getMessage() {

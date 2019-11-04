@@ -56,7 +56,7 @@
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-primary" data-dismiss="modal"
-						onclick="createGroupChat()">Tạo</button>
+						onclick="createGroupChat()">Tạo nhóm</button>
 					<button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
 				</div>
 			</div>
@@ -71,7 +71,24 @@
 		<div class="modal-content">
 			<span class="close">&times;</span>
 			<p>Remove friend from group</p>
-
+			<div class="example">
+				<input id="textSearch" type="text" placeholder="Search.."
+					name="search">
+				<button onclick="searchFriendInGroup()" >
+					<i class="fa fa-search"></i>
+				</button>
+				<button onclick="deleteFriend()" >
+					<i class="fa fa-trash"></i>
+				</button>
+			</div>
+			<table id="myTableDelete">
+				<tr class="header">
+					<th style="width: 40%;">Frist Name</th>
+					<th style="width: 40%;">Last Name</th>
+					<th style="width: 20%;"><input type="checkbox" name="vehicle3"
+						value="Boat" /></th>
+				</tr>
+			</table>
 		</div>
 
 	</div>
@@ -85,12 +102,10 @@
 					<div class="headind_srch">
 						<div class="recent_heading">
 							<h4>Recent</h4>
-
-							<button id="myBtn">Open Modal</button>
-							<button type="button" class="btn btn-info" data-toggle="modal"
-								data-target="#modalCreateGroupChat">Tạo Nhóm</button>
-							<button id="myBtn" style="visibility: hidden;">Open
-								Modal</button>
+							<button id="myBtn" style="visibility: hidden;">Add user</button>
+						<!-- 	<button type="button" class="btn btn-info" data-toggle="modal"
+								data-target="#modalCreateGroupChat">Tạo Nhóm</button>  -->
+							<button id="myBtnDelete" style="visibility: hidden;">Remove user</button>
 
 						</div>
 						<div class="srch_bar">
@@ -131,6 +146,7 @@
 		var currentUser;
 		var friendList;
 		var currentGroup;
+		var listIdAdd = [];
 		var websocket = new WebSocket(
 				"ws://localhost:8080/WebSocketChatServer/chatRoomServer");
 		websocket.onopen = function(message) {
@@ -150,7 +166,7 @@
 		}
 		function processMessage(message) {
 			var respone = JSON.parse(message.data);
-			console.log(respone);
+		
 			if (respone.code == 200) {
 				if (respone.typeRequest == 'getMessage') {
 					for (i in respone.content) {
@@ -174,8 +190,8 @@
 
 					friendList = respone.content;
 					currentUser = respone.content[0].id;
-					console.log(friendList);
-					console.log('currentUser:' + currentUser);
+				
+			
 					for (i in friendList) {
 						showFriendList(respone.content[i]);
 					}
@@ -184,7 +200,6 @@
 				if (respone.typeRequest == 'getGroupList') {
 					groupList = respone.content;
 					for (i in groupList) {
-						console.log(groupList[i])
 						showGroup(groupList[i]);
 					}
 					if (respone.typeRequest == 'getResultSearch') {
@@ -201,10 +216,16 @@
 					showMessageRealTime(respone.content);
 				}
 				if (respone.typeRequest == 'getResultSearch') {
-					showResultSearch(respone.content);
+					var myTable = document.getElementById('myTable');
+					showResultSearch(myTable, respone.content);
 				}
 				if(respone.typeRequest == 'addSuccess'){
 					alert("Add friend success");
+				}
+				if (respone.typeRequest == 'searchFriendsInGroup') {
+					var myTableDelete = document
+							.getElementById('myTableDelete');
+					showResultSearch(myTableDelete, respone.content);
 				}
 			}
 		}
@@ -229,7 +250,6 @@
 					'token' : cookie,
 					'function' : 'GET_MESSAGE'
 				}
-				console.log(message);
 				websocket.send(JSON.stringify(message));
 
 			}
@@ -242,7 +262,6 @@
 					'token' : cookie,
 					'function' : 'GET_MESSAGE_GROUP'
 				}
-				console.log(message);
 				websocket.send(JSON.stringify(message));
 			}
 		}
@@ -258,7 +277,6 @@
 						'content' : content,
 						'function' : 'SEND_MESSAGE_TO_USER'
 					}
-					console.log(message);
 					websocket.send(JSON.stringify(message));
 					showMyMessage(content);
 				} else {
@@ -270,29 +288,83 @@
 						'content' : content,
 						'function' : 'SEND_MESSAGE_TO_GROUP'
 					}
-					console.log(message);
 					websocket.send(JSON.stringify(message));
 					showMyMessage(content);
 				}
 			}
+		}
+		
+		
+		// Delete 
+
+		// Get the modal
+		var modal= document.getElementById("myModal");
+
+		// Get the button that opens the modal
+		var btn = document.getElementById("myBtn");
+
+		// Get the <span> element that closes the modal
+		var span = document.getElementsByClassName("close")[0];
+
+		// When the user clicks the button, open the modal 
+		btn.onclick = function() {
+
+			modal.style.display = "block";
 		}
 
 		// When the user clicks on <span> (x), close the modal
 		span.onclick = function() {
 			modal.style.display = "none";
 		}
+
+		// When the user clicks anywhere outside of the modal, close it
+		window.onclick = function(event) {
+			if (event.target == modal) {
+				modal.style.display = "none";
+			}
+		}
+		
+
+		// Delete 
+
+		// Get the modal
+		var modalDelete = document.getElementById("myModalDelete");
+
+		// Get the button that opens the modal
+		var btnDelete = document.getElementById("myBtnDelete");
+
+		// Get the <span> element that closes the modal
+		var spanDelete = document.getElementsByClassName("close")[1];
+
+		// When the user clicks the button, open the modal 
+		btnDelete.onclick = function() {
+
+			modalDelete.style.display = "block";
+			searchFriendInGroup();
+		}
+
+		// When the user clicks on <span> (x), close the modal
+		spanDelete.onclick = function() {
+			modalDelete.style.display = "none";
+		}
+
+		// When the user clicks anywhere outside of the modal, close it
+		window.onclick = function(event) {
+			if (event.target == modalDelete) {
+				modalDelete.style.display = "none";
+			}
+		}
+		
 		function createConnect() {
-			console.log(websocket);
 			if (typeof websocket != 'undefined'
 					&& websocket.readyState == WebSocket.OPEN) {
-				console.log(websocket);
+			
 				var message = $('#textMessage').val();
 				var context = $('#textMessage').val();
 				var message = {
 					'token' : cookie,
 					'function' : 'START_CONNECTION'
 				}
-				console.log(message);
 				websocket.send(JSON.stringify(message));
 			}
 		}
@@ -307,6 +379,7 @@
 			}
 		}
 	</script>
+	<script type="text/javascript" src="controller.js"></script>
 	<script type="text/javascript" src="slim.js"></script>
 	<script type="text/javascript" src="popper.js"></script>
 	<script type="text/javascript" src="bootstrap.js"></script>
