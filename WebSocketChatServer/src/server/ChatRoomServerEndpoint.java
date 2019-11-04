@@ -1,6 +1,7 @@
 package server;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -94,9 +95,39 @@ public class ChatRoomServerEndpoint {
 				}
 				sendMessageInsertSuccess(userSession);
 			}
+			if ("GET_FRIEND_IN_GROUP".equals(messageFromUser.function)) {
+				if(groupDAOImpl == null) {
+					groupDAOImpl = new GroupDAOImpl();
+				}
+				List<User> friendInGroup = groupDAOImpl.findUserInGroup(messageFromUser.toGroupUser);
+				List<User> result = new ArrayList<>();
+				for (User user : friendInGroup) {
+					if(user.id != Integer.parseInt(messageFromUser.token)) {
+						result.add(user);
+					}
+					
+				}
+				sendResultSearchFriendsInGroup(userSession, result);
+			}
+			if("DELETE_FRIENDS_FROM_GROUP".equals(messageFromUser.function)) {
+				if(groupDAOImpl == null) {
+					groupDAOImpl = new GroupDAOImpl();
+				}
+				for(Integer id : messageFromUser.friendIds) {
+					
+				}
+			}
 		}
 	}
 
+	private void sendResultSearchFriendsInGroup(Session userSession, List<User> users){
+		MessageRespone messageRespone = new MessageRespone<>();
+		messageRespone.typeRequest = "searchFriendsInGroup";
+		messageRespone.code = 200;
+		messageRespone.content= users;
+		ResponeSender.sentRespone(userSession, messageRespone);
+	}
+	
 	private void sendMessageInsertSuccess(Session userSession) {
 		MessageRespone messageRespone = new MessageRespone<>();
 		messageRespone.typeRequest = "addSuccess";

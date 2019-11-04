@@ -290,6 +290,26 @@ img {
   background-color: #f1f1f1;
 }
 
+#myTableDelete {
+  border-collapse: collapse;
+  width: 100%;
+  border: 1px solid #ddd;
+  font-size: 18px;
+}
+
+#myTableDelete th, #myTable td {
+  text-align: left;
+  padding: 5px;
+}
+
+#myTableDelete tr {
+  border-bottom: 1px solid #ddd;
+}
+
+#myTableDelete tr.header, #myTable tr:hover {
+  background-color: #f1f1f1;
+}
+
 
 * {
   box-sizing: border-box;

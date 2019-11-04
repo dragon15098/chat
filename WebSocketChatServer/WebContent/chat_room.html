@@ -22,10 +22,10 @@
 			<div class="example">
 				<input id="textSearch" type="text" placeholder="Search.."
 					name="search">
-				<button onclick="searchFriend()" >
+				<button onclick="searchFriend()">
 					<i class="fa fa-search"></i>
 				</button>
-				<button onclick="addFriendToGroup()" >
+				<button onclick="addFriendToGroup()">
 					<i class="fa fa-search"></i>
 				</button>
 			</div>
@@ -35,16 +35,39 @@
 					<th style="width: 40%;">Last Name</th>
 					<th style="width: 20%;"><input type="checkbox" name="vehicle3"
 						value="Boat" /></th>
-
-				</tr>
-				<tr>
-					<td>Alfreds Futterkiste</td>
-					<td>Alfreds Futterkiste</td>
-					<td><input type="checkbox" name="vehicle3" value="Boat" /></td>
 				</tr>
 			</table>
 		</div>
 
+	</div>
+
+
+	<!-- The Modal -->
+	<div id="myModalDelete" class="modal">
+
+		<!-- Modal content -->
+		<div class="modal-content">
+			<span class="close">&times;</span>
+			<p>Remove friend from group</p>
+
+			<div class="example">
+				<input id="textSearch" type="text" placeholder="Search.."
+					name="search">
+				<button onclick="deleteFriend()">
+					<i class="fa fa-search"></i>
+				</button>
+				<button onclick="deleteFriend()">
+					<i class="fa fa-trash "></i>
+				</button>
+			</div>
+			<table id="myTableDelete">
+				<tr class="header">
+					<th style="width: 40%;">Frist Name</th>
+					<th style="width: 40%;">Last Name</th>
+					<th style="width: 20%;"><input type="checkbox" name="vehicle3" /></th>
+				</tr>
+			</table>
+		</div>
 	</div>
 	<div class="container">
 		<h3 class=" text-center">Messaging</h3>
@@ -54,8 +77,10 @@
 					<div class="headind_srch">
 						<div class="recent_heading">
 							<h4>Recent</h4>
-							<button id="myBtn" style="visibility: hidden;">Open
-								Modal</button>
+							<button id="myBtn" style="visibility: hidden;">Add to
+								group</button>
+							<button id="myBtnDelete" style="visibility: hidden;">Remove
+								user</button>
 						</div>
 						<div class="srch_bar">
 							<div class="stylish-input-group">
@@ -156,10 +181,16 @@
 					showMessageRealTime(respone.content);
 				}
 				if (respone.typeRequest == 'getResultSearch') {
-					showResultSearch(respone.content);
+					var myTable = document.getElementById('myTable');
+					showResultSearch(myTable, respone.content);
 				}
-				if(respone.typeRequest == 'addSuccess'){
+				if (respone.typeRequest == 'addSuccess') {
 					alert("Add friend success");
+				}
+				if (respone.typeRequest == 'searchFriendsInGroup') {
+					var myTableDelete = document
+							.getElementById('myTableDelete');
+					showResultSearch(myTableDelete, respone.content);
 				}
 			}
 		}
@@ -176,7 +207,7 @@
 
 		$(document).ready(function() {
 			createConnect();
-			
+
 		});
 
 		// Get the modal
@@ -196,12 +227,43 @@
 		// When the user clicks on <span> (x), close the modal
 		span.onclick = function() {
 			modal.style.display = "none";
+
 		}
 
 		// When the user clicks anywhere outside of the modal, close it
 		window.onclick = function(event) {
 			if (event.target == modal) {
 				modal.style.display = "none";
+			}
+		}
+
+		// Delete 
+
+		// Get the modal
+		var modalDelete = document.getElementById("myModalDelete");
+
+		// Get the button that opens the modal
+		var btnDelete = document.getElementById("myBtnDelete");
+
+		// Get the <span> element that closes the modal
+		var spanDelete = document.getElementsByClassName("close")[1];
+
+		// When the user clicks the button, open the modal 
+		btnDelete.onclick = function() {
+
+			modalDelete.style.display = "block";
+			searchFriendInGroup();
+		}
+
+		// When the user clicks on <span> (x), close the modal
+		spanDelete.onclick = function() {
+			modalDelete.style.display = "none";
+		}
+
+		// When the user clicks anywhere outside of the modal, close it
+		window.onclick = function(event) {
+			if (event.target == modalDelete) {
+				modalDelete.style.display = "none";
 			}
 		}
 	</script>

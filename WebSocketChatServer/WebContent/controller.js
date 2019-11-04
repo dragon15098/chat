@@ -23,14 +23,15 @@ function addFriendToGroup() {
 		'token' : cookie,
 		'function' : 'ADD_FRIENDS_TO_GROUP',
 		'friendIds' : listIdAdd,
-		'toGroupUser' :currentGroup
+		'toGroupUser' : currentGroup
 	}
 	console.log(message);
 	websocket.send(JSON.stringify(message));
 }
 function searchFriend() {
-	clearTableSearch();
-	addHeaderTable();
+	var myTable = document.getElementById('myTable');
+	clearTableSearch(myTable);
+	addHeaderTable('myTable');
 	var text = $('#textSearch').val();
 	if (typeof websocket != 'undefined'
 			&& websocket.readyState == WebSocket.OPEN) {
@@ -47,11 +48,42 @@ function searchFriend() {
 		websocket.send(JSON.stringify(searchRequest));
 	}
 }
+function deleteFriend() {
+	$('.check').each(function() {
+		if (this.id != 'check-all') {
+			listIdAdd.push(this.id);
+		}
+	});
+	var message = {
+		'token' : cookie,
+		'function' : 'DELETE_FRIENDS_FROM_GROUP',
+		'friendIds' : listIdAdd,
+		'toGroupUser' : currentGroup
+	}
+	console.log(message);
+	websocket.send(JSON.stringify(message));
+}
+function searchFriendInGroup() {
+	var myTable = document.getElementById('myTableDelete');
+	clearTableSearch(myTable);
+	clearTableSearch('myTableDelete');
+	addHeaderTable('myTableDelete');
+	if (typeof websocket != 'undefined'
+			&& websocket.readyState == WebSocket.OPEN) {
+		var message = {
+			'toGroupUser' : currentGroup,
+			'token' : cookie,
+			'function' : 'GET_FRIEND_IN_GROUP'
+		}
+		console.log(message);
+		websocket.send(JSON.stringify(message));
 
-function showResultSearch(data) {
+	}
+}
+function showResultSearch(table, data) {
 	for (i in data) {
 		console.log(data);
-		showDataTable(data[i]);
+		showDataTable(table, data[i]);
 	}
 }
 function getMessage() {
