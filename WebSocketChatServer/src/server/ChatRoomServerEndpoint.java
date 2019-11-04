@@ -23,6 +23,8 @@ import models.dto.User;
 import repository.impl.GroupDAOImpl;
 import repository.impl.MessageDAOImpl;
 import repository.impl.MessageGroupDAOImpl;
+import repository.impl.NoteMessageDAOImpl;
+import repository.impl.NoteMessageGroupDAOImpl;
 import repository.impl.RelationshipDAOImpl;
 import request.Request;
 
@@ -32,6 +34,8 @@ public class ChatRoomServerEndpoint {
 	public MessageGroupDAOImpl messageGroupDAOImpl;
 	public GroupDAOImpl groupDAOImpl;
 	public MessageDAOImpl messageDAOImpl;
+	public NoteMessageDAOImpl noteMessageDAOImpl;
+	public NoteMessageGroupDAOImpl noteMessageGroupDAOImpl;
 	// static Set<Session> users = Collections.synchronizedSet(new HashSet<>());
 
 	public static HashMap<String, Session> userMapping = new HashMap<>();
@@ -115,17 +119,45 @@ public class ChatRoomServerEndpoint {
 					groupDAOImpl = new GroupDAOImpl();
 				}
 				for (Integer id : messageFromUser.friendIds) {
-
+					groupDAOImpl.removeUserFromGroup(messageFromUser.toGroupUser, id);
 				}
+				sendMessageSuccess(userSession);
 			}
 			if ("CREATE_GROUP".equals(messageFromUser.function)) {
-				String groupName = messageFromUser.groupName;
-				List<Integer> listID = messageFromUser.listID;
-				createGroupChat(groupName, listID);
+				String groupName = messageFromUser.content;
+				createGroupChat(groupName, Integer.parseInt(messageFromUser.token));
+			}
+			if ("SAVE_MESSAGE".equals(messageFromUser.function)) {
+				if (messageFromUser.idMessageGroupNote != null) {
+					if(noteMessageGroupDAOImpl == null) {
+						noteMessageGroupDAOImpl = new NoteMessageGroupDAOImpl();
+					}
+					noteMessageGroupDAOImpl.saveMessage(messageFromUser.idMessageGroupNote);
+					sendMessageNoteSuccess(userSession);
+				}
+				if (messageFromUser.idMessageNote != null) {
+					if(noteMessageDAOImpl == null) {
+						noteMessageDAOImpl = new NoteMessageDAOImpl();
+					}
+					noteMessageDAOImpl.saveMessage(messageFromUser.idMessageNote);
+					sendMessageNoteSuccess(userSession);
+				}
 			}
 		}
 	}
 
+	private void sendMessageSuccess(Session userSession) {
+		MessageRespone messageRespone = new MessageRespone<>();
+		messageRespone.code = 200;
+		messageRespone.typeRequest = "delete-success";
+		ResponeSender.sentRespone(userSession, messageRespone);
+	}
+	private void sendMessageNoteSuccess(Session userSession) {
+		MessageRespone messageRespone = new MessageRespone<>();
+		messageRespone.code = 200;
+		messageRespone.typeRequest = "note-message-success";
+		ResponeSender.sentRespone(userSession, messageRespone);
+	}
 	private void sendResultSearchFriendsInGroup(Session userSession, List<User> users) {
 		MessageRespone messageRespone = new MessageRespone<>();
 		messageRespone.typeRequest = "searchFriendsInGroup";
@@ -269,11 +301,11 @@ public class ChatRoomServerEndpoint {
 		messageDAOImpl.insertMessage(message);
 	}
 
-	private void createGroupChat(String groupName, List<Integer> listID) {
+	private void createGroupChat(String groupName, Integer fristUserId) {
 		if (groupDAOImpl == null) {
 			groupDAOImpl = new GroupDAOImpl();
 		}
-		groupDAOImpl.createGroupChat(groupName, listID);
+		groupDAOImpl.createGroupChat(groupName, fristUserId);
 	}
 
 	@OnClose

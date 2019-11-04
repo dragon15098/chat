@@ -68,7 +68,7 @@ function showButtonModifyGroup() {
 }
 function hideButtonModifyGroup() {
 	document.getElementById('myBtn').style.visibility = 'hidden';
-	document.getElementById('myBtnDelete').style.visibility = 'visible';
+	document.getElementById('myBtnDelete').style.visibility = 'hidden';
 }
 function showGroup(group) {
 	var element = document.getElementById("inbox_chat");
@@ -193,7 +193,7 @@ function showMyMessage(message) {
 	var para = document.createElement("p");
 	secondDiv.appendChild(para);
 
-	var node = document.createTextNode(message);
+	var node = document.createTextNode(message.content);
 	para.appendChild(node);
 
 	var s = document.createElement("span");
@@ -201,11 +201,15 @@ function showMyMessage(message) {
 	secondDiv.appendChild(s);
 	var node2 = document.createTextNode("11:01 AM | June 9");
 	s.appendChild(node2);
+	fristDiv.addEventListener('contextmenu', function(ev) {
+		ev.preventDefault();
+		noteMessage(message);
+		return false;
+	}, false);
 	element.appendChild(fristDiv);
 };
 
 function showFriendMessage(message) {
-	
 	var element = document.getElementById("msg_history");
 
 	var fristDiv = document.createElement("div");
@@ -224,7 +228,7 @@ function showFriendMessage(message) {
 
 	var para = document.createElement("p");
 	fourdDiv.appendChild(para);
-	var node = document.createTextNode(message);
+	var node = document.createTextNode(message.content);
 	para.appendChild(node);
 
 	var s = document.createElement("span");
@@ -233,6 +237,12 @@ function showFriendMessage(message) {
 	var node2 = document.createTextNode("11:01 AM | June 9");
 	s.appendChild(node2);
 	fourdDiv.appendChild(s);
+
+	fristDiv.addEventListener('contextmenu', function(ev) {
+		ev.preventDefault();
+		noteMessage(message);
+		return false;
+	}, false);
 
 	element.appendChild(fristDiv);
 };
@@ -250,3 +260,4 @@ function addNewImgTo(parent, src, alt) {
 	parent.appendChild(img);
 	return img;
 }
+

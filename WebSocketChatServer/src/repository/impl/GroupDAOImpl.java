@@ -85,7 +85,7 @@ public class GroupDAOImpl extends DAO implements GroupDAO {
 
 	@Override
 	public void removeUserFromGroup(Integer groupId, Integer userId) {
-		String insertSql = "DELETE FROM group_chat_detail WHERE group_id = ? AND user_id;";
+		String insertSql = "DELETE FROM group_chat_detail WHERE group_id = ? AND user_id = ?;";
 		try {
 			PreparedStatement preparedStatement = getConnection().prepareStatement(insertSql);
 			preparedStatement.setInt(1, groupId);
@@ -150,44 +150,36 @@ public class GroupDAOImpl extends DAO implements GroupDAO {
 	}
 	
 	@Override
-	public void createGroupChat(String groupName, List<Integer> listID) {
-		String insertSql = "INSERT INTO group_chat(content) VALUES ('?')";
+	public void createGroupChat(String groupName, Integer fristUserId) {
+		String insertSql = "INSERT INTO group_chat(content) VALUES (?)";
+		Group group = new Group();
 		try {
-			PreparedStatement preparedStatement = getConnection().prepareStatement(insertSql);
+			PreparedStatement preparedStatement = getConnection().prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS);
 			preparedStatement.setString(1, groupName);
 			int affectedRows = preparedStatement.executeUpdate();
+
 			if (affectedRows == 0) {
-				throw new SQLException("Creating Group Chat failed, no rows affected.");
+				throw new SQLException("Creating user failed, no rows affected.");
+			}
+			
+			try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
+				if (generatedKeys.next()) {
+					group.id = generatedKeys.getInt(1);
+				} else {
+					throw new SQLException("Creating failed, no ID obtained.");
+				}
 			}
 		} catch (SQLException e) {
 			// TODO: handle exception
 		}
-		
-		//Get ID Group
-		int groupID = -1;
-		
-		insertSql = "SELECT id FROM group_chat WHERE content = '?'";
-		try {
-			PreparedStatement preparedStatement = getConnection().prepareStatement(insertSql);
-			preparedStatement.setString(1, groupName);
-			int affectedRows = preparedStatement.executeUpdate();
-			if (affectedRows == 0) {
-				throw new SQLException("Get Group Chat ID failed, no rows affected.");
-			}
-			ResultSet resultSet = preparedStatement.executeQuery();
-			groupID = resultSet.getInt(0);
-		} catch (SQLException e) {
-			// TODO: handle exception
+		if(group.id  == null) {
+			return;
 		}
-		
 		//Insert Mem to GroupChat
 		GroupChatDetail groupChat = new GroupChatDetail();
-		for(Integer userID: listID) {
-			groupChat.groupId = groupID;
-			groupChat.userId = userID;
-			addUserToGroup(groupChat);
-		}
+		
+		groupChat.groupId = group.id;
+		groupChat.userId = fristUserId;
+		addUserToGroup(groupChat);
 	}
-	
-
 }

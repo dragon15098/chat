@@ -6,8 +6,7 @@
 <script type="text/javascript" src="jquery.js"></script>
 <link rel="stylesheet" href="bootstrap.css">
 <link rel="stylesheet" href="styles.css">
-<link rel="stylesheet"
-	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="font-awesome.min.css">
 <title>Demo websocket</title>
 </head>
 
@@ -24,11 +23,11 @@
 			<div class="example">
 				<input id="textSearch" type="text" placeholder="Search.."
 					name="search">
-				<button onclick="searchFriend()" >
+				<button onclick="searchFriend()">
 					<i class="fa fa-search"></i>
 				</button>
-				<button onclick="addFriendToGroup()" >
-					<i class="fa fa-search"></i>
+				<button onclick="addFriendToGroup()">
+					<i class="fa fa-plus"></i>
 				</button>
 			</div>
 			<table id="myTable">
@@ -43,30 +42,10 @@
 	</div>
 
 
-	<!-- START: Modal Create group chat-->
-	<div class="modal fade" role="dialog" data-backdrop="false"
-		id="modalCreateGroupChat">
-		<div class="modal-dialog">
-			<!-- Modal content -->
-			<div class="modal-content-custom">
-				<div class="modal-header">
-					<h4 class="modal-title">
-						Tạo Group Chat: <input type="text" id="textGroupChatName" />
-					</h4>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-primary" data-dismiss="modal"
-						onclick="createGroupChat()">Tạo nhóm</button>
-					<button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
-				</div>
-			</div>
-		</div>
-	</div>
 
 
 	<!-- The Modal -->
 	<div id="myModalDelete" class="modal">
-
 		<!-- Modal content -->
 		<div class="modal-content">
 			<span class="close">&times;</span>
@@ -74,10 +53,10 @@
 			<div class="example">
 				<input id="textSearch" type="text" placeholder="Search.."
 					name="search">
-				<button onclick="searchFriendInGroup()" >
+				<button onclick="searchFriendInGroup()">
 					<i class="fa fa-search"></i>
 				</button>
-				<button onclick="deleteFriend()" >
+				<button onclick="deleteFriend()">
 					<i class="fa fa-trash"></i>
 				</button>
 			</div>
@@ -90,25 +69,45 @@
 				</tr>
 			</table>
 		</div>
-
 	</div>
-	<!-- END: Modal Create group chat-->
+
+
+	<!-- START: Modal Create group chat-->
+	<div id="createGroup" class="modal">
+		<!-- Modal content -->
+		<div class="modal-content">
+			<span class="close">&times;</span>
+			<p>Create group</p>
+			<div class="example">
+				<input id="groupName" type="text" placeholder="Group name"
+					name="search">
+				<button onclick="createGroup()">
+					<i class="fa fa-plus"></i>
+				</button>
+			</div>
+		</div>
+	</div>
 
 	<div class="container">
-		<h3 class=" text-center">Messaging</h3>
+		<h3 class="text-center">Messaging</h3>
 		<div class="messaging">
 			<div class="inbox_msg">
 				<div class="inbox_people">
 					<div class="headind_srch">
 						<div class="recent_heading">
 							<h4>Recent</h4>
-							<button id="myBtn" style="visibility: hidden;">Add user</button>
-						<!-- 	<button type="button" class="btn btn-info" data-toggle="modal"
-								data-target="#modalCreateGroupChat">Tạo Nhóm</button>  -->
-							<button id="myBtnDelete" style="visibility: hidden;">Remove user</button>
+							<button id="myBtnGroup" class="btn btn-info">Create
+								group</button>
+							<br>
+							<button id="myBtn" class="btn btn-info"
+								style="visibility: hidden;">Add user</button>
+							<br>
+							
+							<button id="myBtnDelete" class="btn btn-info"
+								style="visibility: hidden;">Remove user</button>
 
 						</div>
-						<div class="srch_bar">
+						<!-- 	<div class="srch_bar">
 							<div class="stylish-input-group">
 								<input type="text" class="search-bar" placeholder="Search">
 								<span class="input-group-addon">
@@ -117,7 +116,7 @@
 									</button>
 								</span>
 							</div>
-						</div>
+						</div>  -->
 					</div>
 					<div id="inbox_chat" class="inbox_chat"></div>
 				</div>
@@ -166,23 +165,25 @@
 		}
 		function processMessage(message) {
 			var respone = JSON.parse(message.data);
-		
+
 			if (respone.code == 200) {
 				if (respone.typeRequest == 'getMessage') {
 					for (i in respone.content) {
 						if (respone.content[i].fromUserId == cookie) {
-							showMyMessage(respone.content[i].content);
+							showMyMessage(respone.content[i]);
 						} else {
-							showFriendMessage(respone.content[i].content);
+							console.log('respone.content[i]');
+							console.log(respone.content[i]);
+							showFriendMessage(respone.content[i]);
 						}
 					}
 				}
 				if (respone.typeRequest == 'getMessageGroup') {
 					for (i in respone.content) {
 						if (respone.content[i].fromUserId == cookie) {
-							showMyMessage(respone.content[i].content);
+							showMyMessage(respone.content[i]);
 						} else {
-							showFriendMessage(respone.content[i].content);
+							showFriendMessage(respone.content[i]);
 						}
 					}
 				}
@@ -190,8 +191,7 @@
 
 					friendList = respone.content;
 					currentUser = respone.content[0].id;
-				
-			
+
 					for (i in friendList) {
 						showFriendList(respone.content[i]);
 					}
@@ -219,13 +219,19 @@
 					var myTable = document.getElementById('myTable');
 					showResultSearch(myTable, respone.content);
 				}
-				if(respone.typeRequest == 'addSuccess'){
+				if (respone.typeRequest == 'addSuccess') {
 					alert("Add friend success");
 				}
 				if (respone.typeRequest == 'searchFriendsInGroup') {
 					var myTableDelete = document
 							.getElementById('myTableDelete');
 					showResultSearch(myTableDelete, respone.content);
+				}
+				if (respone.typeRequest == 'delete-success') {
+					alert('Delete success');
+				}
+				if (respone.typeRequest == 'note-message-success') {
+					alert('Save success');
 				}
 			}
 		}
@@ -265,40 +271,11 @@
 				websocket.send(JSON.stringify(message));
 			}
 		}
-		function sendMessage() {
-			if (typeof websocket != 'undefined'
-					&& websocket.readyState == WebSocket.OPEN) {
-				if (currentUser != null) {
-					var content = $('#textMessage').val();
-					$('#textMessage').val("");
-					var message = {
-						'toUser' : currentUser,
-						'token' : cookie,
-						'content' : content,
-						'function' : 'SEND_MESSAGE_TO_USER'
-					}
-					websocket.send(JSON.stringify(message));
-					showMyMessage(content);
-				} else {
-					var content = $('#textMessage').val();
-					$('#textMessage').val("");
-					var message = {
-						'toGroupUser' : currentGroup,
-						'token' : cookie,
-						'content' : content,
-						'function' : 'SEND_MESSAGE_TO_GROUP'
-					}
-					websocket.send(JSON.stringify(message));
-					showMyMessage(content);
-				}
-			}
-		}
-		
-		
+
 		// Delete 
 
 		// Get the modal
-		var modal= document.getElementById("myModal");
+		var modal = document.getElementById("myModal");
 
 		// Get the button that opens the modal
 		var btn = document.getElementById("myBtn");
@@ -323,7 +300,6 @@
 				modal.style.display = "none";
 			}
 		}
-		
 
 		// Delete 
 
@@ -354,11 +330,40 @@
 				modalDelete.style.display = "none";
 			}
 		}
-		
+
+		// Create group 
+
+		// Get the modal
+		var modalGroup = document.getElementById("createGroup");
+
+		// Get the button that opens the modal
+		var btnGroup = document.getElementById("myBtnGroup");
+
+		// Get the <span> element that closes the modal
+		var spanGroup = document.getElementsByClassName("close")[2];
+
+		// When the user clicks the button, open the modal 
+		btnGroup.onclick = function() {
+			modalGroup.style.display = "block";
+			showFriendList
+		}
+
+		// When the user clicks on <span> (x), close the modal
+		spanGroup.onclick = function() {
+			modalGroup.style.display = "none";
+		}
+
+		// When the user clicks anywhere outside of the modal, close it
+		window.onclick = function(event) {
+			if (event.target == modalGroup) {
+				modalGroup.style.display = "none";
+			}
+		}
+
 		function createConnect() {
 			if (typeof websocket != 'undefined'
 					&& websocket.readyState == WebSocket.OPEN) {
-			
+
 				var message = $('#textMessage').val();
 				var context = $('#textMessage').val();
 				var message = {

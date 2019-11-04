@@ -12,4 +12,6 @@ public class Request {
 	public List<Integer> friendIds;
 	public List<Integer> listID;
 	public String groupName;
+	public Integer idMessageNote;
+	public Integer idMessageGroupNote;
 }
