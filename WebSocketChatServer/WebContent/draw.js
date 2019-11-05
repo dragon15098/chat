@@ -209,6 +209,34 @@ function showMyMessage(message) {
 	element.appendChild(fristDiv);
 };
 
+
+function showMyMessageNote(message) {
+	var element = document.getElementById("msg_history_note");
+	var fristDiv = document.createElement("div");
+	fristDiv.classList.add('outgoing_msg');
+	var secondDiv = document.createElement("div");
+	secondDiv.classList.add('sent_msg');
+	fristDiv.appendChild(secondDiv);
+
+	var para = document.createElement("p");
+	secondDiv.appendChild(para);
+
+	var node = document.createTextNode(message.content);
+	para.appendChild(node);
+
+	var s = document.createElement("span");
+	s.classList.add('time_date');
+	secondDiv.appendChild(s);
+	var node2 = document.createTextNode("11:01 AM | June 9");
+	s.appendChild(node2);
+	fristDiv.addEventListener('contextmenu', function(ev) {
+		ev.preventDefault();
+		noteMessage(message);
+		return false;
+	}, false);
+	element.appendChild(fristDiv);
+};
+
 function showFriendMessage(message) {
 	var element = document.getElementById("msg_history");
 
@@ -247,6 +275,43 @@ function showFriendMessage(message) {
 	element.appendChild(fristDiv);
 };
 
+function showFriendMessageNote(message) {
+	var element = document.getElementById("msg_history_note");
+
+	var fristDiv = document.createElement("div");
+	fristDiv.classList.add('incoming_msg');
+
+	var secondDiv = addNewDivTo(fristDiv, 'incoming_msg_img');
+
+	var image = document.createElement("img");
+	image.src = "user-profile.png";
+	image.alt = "sunil";
+	secondDiv.appendChild(image);
+
+	var thirdDiv = addNewDivTo(fristDiv, 'received_msg')
+
+	var fourdDiv = addNewDivTo(thirdDiv, 'received_withd_msg');
+
+	var para = document.createElement("p");
+	fourdDiv.appendChild(para);
+	var node = document.createTextNode(message.content);
+	para.appendChild(node);
+
+	var s = document.createElement("span");
+	s.classList.add('time_date');
+
+	var node2 = document.createTextNode("11:01 AM | June 9");
+	s.appendChild(node2);
+	fourdDiv.appendChild(s);
+
+	fristDiv.addEventListener('contextmenu', function(ev) {
+		ev.preventDefault();
+		noteMessage(message);
+		return false;
+	}, false);
+
+	element.appendChild(fristDiv);
+};
 function addNewDivTo(parent, style) {
 	var div = document.createElement("div");
 	div.classList.add(style);

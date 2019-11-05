@@ -180,8 +180,31 @@ function noteMessage(message) {
 			websocket.send(JSON.stringify(message));
 		} else {
 			var message = {
-				'idMessageGroupNote' :  message.id,
+				'idMessageGroupNote' : message.id,
 				'function' : 'SAVE_MESSAGE'
+			}
+			console.log(message);
+			websocket.send(JSON.stringify(message));
+		}
+	}
+}
+
+function getNoteMessage() {
+	if (typeof websocket != 'undefined'
+			&& websocket.readyState == WebSocket.OPEN) {
+		if (currentUser != null) {
+			var message = {
+				'toUser' : currentUser,
+				'token' : cookie,
+ 				'function' : 'GET_NOTE_MESSAGE'
+			}
+			console.log(message);
+			websocket.send(JSON.stringify(message));
+		} else {
+			var message = {
+				'toGroupUser' : currentGroup,
+				'token' : cookie,
+				'function' : 'GET_NOTE_MESSAGE'
 			}
 			console.log(message);
 			websocket.send(JSON.stringify(message));

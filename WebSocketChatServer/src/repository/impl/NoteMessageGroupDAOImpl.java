@@ -32,4 +32,10 @@ public class NoteMessageGroupDAOImpl extends DAO implements NoteMessageGroupDAO{
 		}
 	}
 
+	@Override
+	public void getNoteMessage(Integer groupId) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

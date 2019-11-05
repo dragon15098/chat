@@ -88,6 +88,23 @@
 		</div>
 	</div>
 
+
+	<div id="myModalNote" class="modal">
+		<!-- Modal content -->
+		<div class="modal-content">
+			<span class="close">&times;</span>
+			<p>Note message</p>
+			<div class="mesgs_note">
+				<div id="msg_history_note" class="msg_history"></div>
+				<div class="type_msg">
+					<div class="input_msg_write">
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
 	<div class="container">
 		<h3 class="text-center">Messaging</h3>
 		<div class="messaging">
@@ -98,11 +115,13 @@
 							<h4>Recent</h4>
 							<button id="myBtnGroup" class="btn btn-info">Create
 								group</button>
-							<br>
+
+							<button id="myBtnNote" class="btn btn-info">Note Message</button>
+
 							<button id="myBtn" class="btn btn-info"
 								style="visibility: hidden;">Add user</button>
-							<br>
-							
+
+
 							<button id="myBtnDelete" class="btn btn-info"
 								style="visibility: hidden;">Remove user</button>
 
@@ -210,10 +229,10 @@
 					}
 				}
 				if (respone.typeRequest == 'getMessageFromUser') {
-					showMessageRealTime(respone.content);
+					showMessageRealTime(respone);
 				}
 				if (respone.typeRequest == 'getMessageGroupFromUser') {
-					showMessageRealTime(respone.content);
+					showMessageRealTime(respone);
 				}
 				if (respone.typeRequest == 'getResultSearch') {
 					var myTable = document.getElementById('myTable');
@@ -232,6 +251,15 @@
 				}
 				if (respone.typeRequest == 'note-message-success') {
 					alert('Save success');
+				}
+				if (respone.typeRequest == 'get_message_note') {
+					for (i in respone.content) {
+						if (respone.content[i].fromUserId == cookie) {
+							showMyMessageNote(respone.content[i]);
+						} else {
+							showFriendMessageNote(respone.content[i]);
+						}
+					}
 				}
 			}
 		}
@@ -345,7 +373,6 @@
 		// When the user clicks the button, open the modal 
 		btnGroup.onclick = function() {
 			modalGroup.style.display = "block";
-			showFriendList
 		}
 
 		// When the user clicks on <span> (x), close the modal
@@ -360,6 +387,37 @@
 			}
 		}
 
+		
+
+		// note message 
+
+		// Get the modal
+		var modalNote = document.getElementById("myModalNote");
+
+		// Get the button that opens the modal
+		var btnNote = document.getElementById("myBtnNote");
+
+		// Get the <span> element that closes the modal
+		var spanNote = document.getElementsByClassName("close")[3];
+
+		// When the user clicks the button, open the modal 
+		btnNote.onclick = function() {
+			modalNote.style.display = "block";
+			getNoteMessage();
+		}
+
+		// When the user clicks on <span> (x), close the modal
+		spanNote.onclick = function() {
+			modalNote.style.display = "none";
+		}
+
+		// When the user clicks anywhere outside of the modal, close it
+		window.onclick = function(event) {
+			if (event.target == modalNote) {
+				modalNote.style.display = "none";
+			}
+		}
+		
 		function createConnect() {
 			if (typeof websocket != 'undefined'
 					&& websocket.readyState == WebSocket.OPEN) {

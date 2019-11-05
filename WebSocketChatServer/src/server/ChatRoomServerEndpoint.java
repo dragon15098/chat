@@ -129,18 +129,38 @@ public class ChatRoomServerEndpoint {
 			}
 			if ("SAVE_MESSAGE".equals(messageFromUser.function)) {
 				if (messageFromUser.idMessageGroupNote != null) {
-					if(noteMessageGroupDAOImpl == null) {
+					if (noteMessageGroupDAOImpl == null) {
 						noteMessageGroupDAOImpl = new NoteMessageGroupDAOImpl();
 					}
 					noteMessageGroupDAOImpl.saveMessage(messageFromUser.idMessageGroupNote);
 					sendMessageNoteSuccess(userSession);
 				}
 				if (messageFromUser.idMessageNote != null) {
-					if(noteMessageDAOImpl == null) {
+					if (noteMessageDAOImpl == null) {
 						noteMessageDAOImpl = new NoteMessageDAOImpl();
 					}
 					noteMessageDAOImpl.saveMessage(messageFromUser.idMessageNote);
 					sendMessageNoteSuccess(userSession);
+				}
+			}
+			if ("GET_NOTE_MESSAGE".equals(messageFromUser.function)) {
+				if (messageFromUser.toUser != null) {
+					if (noteMessageDAOImpl == null) {
+						noteMessageDAOImpl = new NoteMessageDAOImpl();
+					}
+					List<MessageDTO> dtos = noteMessageDAOImpl.getNoteMessage(Integer.parseInt(messageFromUser.token),
+							messageFromUser.toUser);
+					MessageRespone messageRespone = new MessageRespone<>();
+					messageRespone.code = 200;
+					messageRespone.content = dtos;
+					messageRespone.typeRequest = "get_message_note";
+					ResponeSender.sentRespone(userSession, messageRespone);
+				}
+				if (messageFromUser.toGroupUser != null) {
+					if (noteMessageDAOImpl == null) {
+						noteMessageDAOImpl = new NoteMessageDAOImpl();
+					}
+
 				}
 			}
 		}
@@ -152,12 +172,14 @@ public class ChatRoomServerEndpoint {
 		messageRespone.typeRequest = "delete-success";
 		ResponeSender.sentRespone(userSession, messageRespone);
 	}
+
 	private void sendMessageNoteSuccess(Session userSession) {
 		MessageRespone messageRespone = new MessageRespone<>();
 		messageRespone.code = 200;
 		messageRespone.typeRequest = "note-message-success";
 		ResponeSender.sentRespone(userSession, messageRespone);
 	}
+
 	private void sendResultSearchFriendsInGroup(Session userSession, List<User> users) {
 		MessageRespone messageRespone = new MessageRespone<>();
 		messageRespone.typeRequest = "searchFriendsInGroup";
